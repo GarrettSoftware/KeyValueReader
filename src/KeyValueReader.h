@@ -6,11 +6,14 @@
 class KeyValueReader final
 {
 public:
+    
+    // Status error values
     enum STATUS {
         StatusSuccess,
         StatusOpenFileError,
         StatusParseFileError,
-        StatusKeyNotFound
+        StatusKeyNotFound,
+        StatusStringConversionError
     };
     
     // Constructor/Destructor
@@ -26,12 +29,13 @@ public:
     STATUS getString(const std::string &key, std::string &value);
     STATUS getInt(const std::string &key, int &value);
     STATUS getDouble(const std::string &key, double &value);
+    STATUS getFloat(const std::string &key, float &value);
     STATUS getBool(const std::string &key, bool &value);
     void print();
     
 private:
-    class PrivateData;
-    PrivateData *c_data;
+    class Private;
+    Private *c_data;
 };
 
 #endif

@@ -1,0 +1,92 @@
+<h1>KeyValueReader - simple key-value file reader</h1>
+
+<h2>Overview</h2>
+
+<p>This software implements a single class to easily add basic file input to your programs.
+Just put KeyValueReader.cpp and KeyValueReader.h in your project and add the extra sources to your build scripts.
+Basic usage looks like the following (with error checking omitted for simplicity).</p>
+
+<pre><code>string runType;
+int problemSize;
+double tolerance;
+bool doExtraThing;
+
+KeyValueReader kvr;
+kvr.readFile("input.kv");
+kvr.getString("RUN_TYPE", runType);
+kvr.getInt("PROBLEM_SIZE", problemSize);
+kvr.getDouble("TOLERANCE", tolerance);
+kvr.getBool("DO_EXTRA_THING", doExtraThing);
+</code></pre>
+
+<h2>Interface</h2>
+
+<pre><code>enum STATUS {
+    StatusSuccess,
+    StatusOpenFileError,
+    StatusParseFileError,
+    StatusKeyNotFound,
+    StatusStringConversionError
+};
+
+explicit KeyValueReader();
+~KeyValueReader();
+
+STATUS readFile(const std::string &amp;filename);
+STATUS getString(const std::string &amp;key, std::string &amp;value);
+STATUS getInt(const std::string &amp;key, int &amp;value);
+STATUS getDouble(const std::string &amp;key, double &amp;value);
+STATUS getFloat(const std::string &amp;key, float &amp;value);
+STATUS getBool(const std::string &amp;key, bool &amp;value);
+void print();
+</code></pre>
+
+<h3>readFile</h3>
+
+<p>This function reads and parses the file given by <code>filename</code>.
+It will return <code>StatusSuccess</code> if the file could be read and parsed correctly.
+If the file cannot be opened, <code>StatusOpenFileError</code> is returned.
+If there is a parse error, <code>StatusParseFileError</code> is returned, but in this case, some lines may be parsed correctly and those lines will be stored by the KeyValueReader.
+In the case of parse errors, a line is printed to standard out specifying the file and line of the error.</p>
+
+<h3>getString, getInt, ...</h3>
+
+<p>These functions take a <code>key</code> as input and return the appropriate <code>value</code> in the KeyValueReader.
+If the <code>key</code> does not exist, <code>StatusKeyNotFound</code> is returned.
+If something other than getString is called, a conversion from a string value to the appropriate value is made.
+In this case it is possible to get a <code>StatusStringConversionError</code> returned.
+If there is no error, <code>StatusSuccess</code> is returned.
+Note, the key search is not case sensitive, but the value returned from getString does not change the case of <code>value</code> from the input file.</p>
+
+<h3>print</h3>
+
+<p>This function prints all the key/value pairs in the KeyValueReader.</p>
+
+<h3>Error checking macro</h3>
+
+<p>To do...</p>
+
+<h2>File Format</h2>
+
+<p>The key/value file format is a line based format (i.e. 1 key/value pair should be held on a single line).
+The class allows for single line comments starting with the <code>#</code> character.
+Whitespace is ignored except to delimit the key from the value.
+A line can consist of a key/value pair with or without a comment, just a comment, or solely whitespace.
+Below is the specification for the key/value file format.</p>
+
+<pre><code>(&lt;whitespace&gt;)* &lt;token&gt; (&lt;whitespace)+ &lt;token&gt; (&lt;whitespace&gt;)* &lt;comment&gt;
+(&lt;whitespace&gt;)* &lt;comment&gt;
+(&lt;whitespace&gt;)*
+</code></pre>
+
+<ul>
+<li>Each whitespace character is either a space or tab.</li>
+<li>Each token is made up of either letters, numbers, or "+-_.".</li>
+<li>A comment consists of <code>#</code> followed by any characters</li>
+</ul>
+
+<p>An example of an input file might look like the following.
+    RUN<em>TYPE type1
+    PROBLEM</em>SIZE 1000
+    TOLERANCE 0.01
+    DO<em>EXTRA</em>THING true</p>
