@@ -1,3 +1,13 @@
+<html>
+<head> 
+<style>
+body {width: 80ex; margin: 2ex}
+</style>
+</head>
+<body>
+
+
+
 <h1>KeyValueReader - simple key-value file reader</h1>
 
 <h2>Overview</h2>
@@ -85,8 +95,14 @@ Below is the specification for the key/value file format.</p>
 <li>A comment consists of <code>#</code> followed by any characters</li>
 </ul>
 
-<p>An example of an input file might look like the following.
-    RUN<em>TYPE type1
-    PROBLEM</em>SIZE 1000
-    TOLERANCE 0.01
-    DO<em>EXTRA</em>THING true</p>
+<p>An example of an input file might look like the following.</p>
+
+<pre><code># My Example Key-Value File
+RUN_TYPE        type1   
+PROBLEM_SIZE    1000    # Big Problem
+TOLERANCE       0.01    # Small Tolerance
+DO_EXTRA_THING  true
+</code></pre>
+
+
+</body></html>

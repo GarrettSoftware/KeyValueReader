@@ -76,10 +76,12 @@ Below is the specification for the key/value file format.
 * A comment consists of `#` followed by any characters
 
 An example of an input file might look like the following.
-    RUN_TYPE type1
-    PROBLEM_SIZE 1000
-    TOLERANCE 0.01
-    DO_EXTRA_THING true
+    
+    # My Example Key-Value File
+    RUN_TYPE        type1   
+    PROBLEM_SIZE    1000    # Big Problem
+    TOLERANCE       0.01    # Small Tolerance
+    DO_EXTRA_THING  true
 
 
 
