@@ -32,9 +32,10 @@ public:
     STATUS getFloat(const std::string &key, float &value);
     STATUS getBool(const std::string &key, bool &value);
     void print();
+    void setAbortOnError(bool willAbort);
     
 private:
-    class Private;
+    struct Private;
     Private *c_data;
 };
 

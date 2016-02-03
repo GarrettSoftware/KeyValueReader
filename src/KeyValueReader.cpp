@@ -9,15 +9,27 @@ using namespace std;
 /*
     PrivateData class
 */
-class KeyValueReader::Private
+struct KeyValueReader::Private
 {
-public:
-    bool parseLine(const int lineNum, const string &filename, const string &line);
-    
-    vector<string> keyVector;
-    vector<string> valueVector;
-    bool isFileRead;
+    vector<string> c_keyVector;
+    vector<string> c_valueVector;
+    bool c_isFileRead;
+    bool c_willAbort;
+    string c_filename;
 };
+
+
+/*
+    abortMessage
+*/
+static
+void abortMessage(const string &message, const string &filename)
+{
+    printf("KeyValueReader error causing abort in file %s.\n",
+           filename.c_str());
+    printf("   %s\n", message.c_str());
+    abort();
+}
 
 
 /*
@@ -51,7 +63,7 @@ size_t deleteWhitespace(string &line)
 
 
 /*
-    convertToUpperCase
+    areStringsEqual
 */
 static
 bool areStringsEqual(const string &s1, const string &s2)
@@ -93,14 +105,15 @@ void popToken(string &line, string &token)
 /*
     parseLine
 */
-bool KeyValueReader::Private::parseLine(const int lineNum, 
-                                        const string &filename,
-                                        const string &line)
+//bool KeyValueReader::Private::parseLine(const string &line,
+//                                        string &outKey, string &outValue)
+static
+bool parseLine(const string &line, string &outKey, string &outValue)
 {
     string parsedLine = line;
+    size_t numWhitespace = 0;
     string key = "";
     string value = "";
-    size_t numWhitespace;
     
     // Get rid of comments in line
     getRidOfComments(parsedLine);
@@ -115,21 +128,18 @@ bool KeyValueReader::Private::parseLine(const int lineNum,
     // Get key
     popToken(parsedLine, key);
     if (key == "") {
-        printf("Parse error in file %s on line %d\n", filename.c_str(), lineNum);
         return false;
     }
     
     // Delete whitespace
     numWhitespace = deleteWhitespace(parsedLine);
     if (numWhitespace == 0) {
-        printf("Parse error in file %s on line %d\n", filename.c_str(), lineNum);
         return false;
     }
     
     // Get value
     popToken(parsedLine, value);
     if (value == "") {
-        printf("Parse error in file %s on line %d\n", filename.c_str(), lineNum);
         return false;
     }
     
@@ -138,13 +148,12 @@ bool KeyValueReader::Private::parseLine(const int lineNum,
     
     // Check for non-empty line
     if (parsedLine.size() != 0) {
-        printf("Parse error in file %s on line %d\n", filename.c_str(), lineNum);
         return false;
     }
     
     // If here, the line parsed correctly
-    keyVector.push_back(key);
-    valueVector.push_back(value);
+    outKey = key;
+    outValue = value;
     return true;
 }
 
@@ -155,7 +164,9 @@ bool KeyValueReader::Private::parseLine(const int lineNum,
 KeyValueReader::KeyValueReader()
 {
     c_data = new Private();
-    c_data->isFileRead = false;
+    c_data->c_isFileRead = false;
+    c_data->c_willAbort = true;
+    c_data->c_filename = "";
 }
 KeyValueReader::~KeyValueReader()
 {
@@ -175,21 +186,36 @@ KeyValueReader::readFile(const string &filename)
     STATUS status = StatusSuccess;
     
     // Open file
+    c_data->c_filename = filename;
     file.open(filename);
     if (!file.is_open()) {
+        if (c_data->c_willAbort)
+            abortMessage("Could not open file", c_data->c_filename);
         return StatusOpenFileError;
     }
     
+    
     // Parse each line
     while (std::getline(file, line)) {
-        bool parseOk = c_data->parseLine(lineNum, filename, line);
-        if (!parseOk)
+        string key = "";
+        string value = "";
+        bool parseOk = parseLine(line, key, value);
+        
+        if (!parseOk) {
             status = StatusParseFileError;
+            printf("Parse error in file %s on line %d\n", filename.c_str(), lineNum);
+        }
+        else if (key != "") {
+            c_data->c_keyVector.push_back(key);
+            c_data->c_valueVector.push_back(value);
+        }
         lineNum++;
     }
     
     // Close file and return
     file.close();
+    if (c_data->c_willAbort && status != StatusSuccess)
+        abortMessage("Parse line error", c_data->c_filename);
     return status;
 }
 
@@ -200,13 +226,15 @@ KeyValueReader::readFile(const string &filename)
 KeyValueReader::STATUS
 KeyValueReader::getString(const std::string &key, std::string &value)
 {
-    for (size_t i = 0; i < c_data->keyVector.size(); i++) {
-        if (areStringsEqual(key, c_data->keyVector[i])) {
-            value = c_data->keyVector[i];
+    for (size_t i = 0; i < c_data->c_keyVector.size(); i++) {
+        if (areStringsEqual(key, c_data->c_keyVector[i])) {
+            value = c_data->c_keyVector[i];
             return StatusSuccess;
         }
     }
     
+    if (c_data->c_willAbort)
+        abortMessage("Key not found", c_data->c_filename);
     return StatusKeyNotFound;
 }
 
@@ -223,6 +251,8 @@ KeyValueReader::getInt(const std::string &key, int &value)
     status = getString(key, valueString);
     if (status != StatusSuccess) {
         value = 0;
+        if (c_data->c_willAbort)
+            abortMessage("Key not found", c_data->c_filename);
         return status;
     }
     
@@ -231,6 +261,8 @@ KeyValueReader::getInt(const std::string &key, int &value)
     }
     catch (...) {
         value = 0;
+        if (c_data->c_willAbort)
+            abortMessage("Error converting value to int", c_data->c_filename);
         return StatusStringConversionError;
     }
     
@@ -250,6 +282,8 @@ KeyValueReader::getDouble(const std::string &key, double &value)
     status = getString(key, valueString);
     if (status != StatusSuccess) {
         value = 0;
+        if (c_data->c_willAbort)
+            abortMessage("Key not found", c_data->c_filename);
         return status;
     }
     
@@ -258,6 +292,8 @@ KeyValueReader::getDouble(const std::string &key, double &value)
     }
     catch (...) {
         value = 0.0;
+        if (c_data->c_willAbort)
+            abortMessage("Error converting value to double", c_data->c_filename);
         return StatusStringConversionError;
     }
     
@@ -277,6 +313,8 @@ KeyValueReader::getFloat(const std::string &key, float &value)
     status = getString(key, valueString);
     if (status != StatusSuccess) {
         value = 0;
+        if (c_data->c_willAbort)
+            abortMessage("Key not found", c_data->c_filename);
         return status;
     }
     
@@ -285,6 +323,8 @@ KeyValueReader::getFloat(const std::string &key, float &value)
     }
     catch (...) {
         value = 0.0f;
+        if (c_data->c_willAbort)
+            abortMessage("Error converting value to float", c_data->c_filename);
         return StatusStringConversionError;
     }
     
@@ -305,33 +345,26 @@ KeyValueReader::getBool(const std::string &key, bool &value)
     status = getString(key, valueString);
     if (status != StatusSuccess) {
         value = 0;
+        if (c_data->c_willAbort)
+            abortMessage("Key not found", c_data->c_filename);
         return status;
     }
     
     // Check for true
-    if (valueString.size() == 4 &&
-        tolower(valueString[0]) == 't' &&
-        tolower(valueString[1]) == 'r' &&
-        tolower(valueString[2]) == 'u' &&
-        tolower(valueString[3]) == 'e')
-    {
+    if (areStringsEqual(valueString, "true")) {
         value = true;
         return StatusSuccess;
     }
     
     // Check for false
-    if (valueString.size() == 5 &&
-        tolower(valueString[0]) == 'f' &&
-        tolower(valueString[1]) == 'a' &&
-        tolower(valueString[2]) == 'l' &&
-        tolower(valueString[3]) == 's' &&
-        tolower(valueString[4]) == 'e')
-    {
+    if (areStringsEqual(valueString, "false")) {
         value = false;
         return StatusSuccess;
     }
     
     // String conversion error if we get here
+    if (c_data->c_willAbort)
+        abortMessage("Error converting value to bool", c_data->c_filename);
     return StatusStringConversionError;
 }
 
@@ -341,11 +374,22 @@ KeyValueReader::getBool(const std::string &key, bool &value)
 */
 void KeyValueReader::print()
 {
-    printf("\n--- KeyValueReader Data ---\n");
-    for (size_t i = 0; i < c_data->keyVector.size(); i++) {
-        printf("    %s %s\n", c_data->keyVector[i].c_str(), 
-                              c_data->valueVector[i].c_str());
+    printf("\n--- KeyValueReader Data (%s) ---\n", c_data->c_filename.c_str());
+    for (size_t i = 0; i < c_data->c_keyVector.size(); i++) {
+        printf("    %s %s\n", c_data->c_keyVector[i].c_str(), 
+                              c_data->c_valueVector[i].c_str());
     }
     printf("\n");
 }
+
+
+/*
+    setAbortOnError
+*/
+void KeyValueReader::setAbortOnError(bool willAbort)
+{
+    c_data->c_willAbort = willAbort;
+}
+
+
 
