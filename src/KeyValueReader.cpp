@@ -6,30 +6,11 @@
 using namespace std;
 
 
-/*
-    PrivateData class
-*/
-struct KeyValueReader::Private
-{
-    vector<string> c_keyVector;
-    vector<string> c_valueVector;
-    bool c_isFileRead;
-    bool c_willAbort;
-    string c_filename;
-};
-
-
-/*
-    abortMessage
-*/
-static
-void abortMessage(const string &message, const string &filename)
-{
-    printf("KeyValueReader error causing abort in file %s.\n",
-           filename.c_str());
-    printf("   %s\n", message.c_str());
-    abort();
-}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                              Helper Functions
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 /*
@@ -105,8 +86,6 @@ void popToken(string &line, string &token)
 /*
     parseLine
 */
-//bool KeyValueReader::Private::parseLine(const string &line,
-//                                        string &outKey, string &outValue)
 static
 bool parseLine(const string &line, string &outKey, string &outValue)
 {
@@ -158,6 +137,50 @@ bool parseLine(const string &line, string &outKey, string &outValue)
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                              Private Class Data
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+
+/*
+    PrivateData class
+*/
+struct KeyValueReader::Private
+{
+    void abortMessage(const string &message);
+    
+    vector<string> c_keyVector;
+    vector<string> c_valueVector;
+    bool c_isFileRead;
+    bool c_willAbort;
+    string c_filename;
+};
+
+
+/*
+    abortMessage
+*/
+void KeyValueReader::Private::abortMessage(const string &message)
+{
+    if (!c_willAbort)
+        return;
+    
+    printf("KeyValueReader error causing abort in file %s.\n",
+           c_filename.c_str());
+    printf("   %s\n", message.c_str());
+    abort();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                              Class Implementation
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+
 /*
     Constructor/Destructor
 */
@@ -185,12 +208,21 @@ KeyValueReader::readFile(const string &filename)
     int lineNum = 1;
     STATUS status = StatusSuccess;
     
+    
+    // Check if already read a file
+    if (c_data->c_isFileRead) {
+        if (c_data->c_willAbort)
+            c_data->abortMessage("Already read a file");
+        return StatusAlreadyReadAFile;
+    }
+    
+    
     // Open file
     c_data->c_filename = filename;
     file.open(filename);
     if (!file.is_open()) {
         if (c_data->c_willAbort)
-            abortMessage("Could not open file", c_data->c_filename);
+            c_data->abortMessage("Could not open file");
         return StatusOpenFileError;
     }
     
@@ -215,7 +247,7 @@ KeyValueReader::readFile(const string &filename)
     // Close file and return
     file.close();
     if (c_data->c_willAbort && status != StatusSuccess)
-        abortMessage("Parse line error", c_data->c_filename);
+        c_data->abortMessage("Parse line error");
     return status;
 }
 
@@ -234,7 +266,7 @@ KeyValueReader::getString(const std::string &key, std::string &value)
     }
     
     if (c_data->c_willAbort)
-        abortMessage("Key not found", c_data->c_filename);
+        c_data->abortMessage("Key not found");
     return StatusKeyNotFound;
 }
 
@@ -252,7 +284,7 @@ KeyValueReader::getInt(const std::string &key, int &value)
     if (status != StatusSuccess) {
         value = 0;
         if (c_data->c_willAbort)
-            abortMessage("Key not found", c_data->c_filename);
+            c_data->abortMessage("Key not found");
         return status;
     }
     
@@ -262,7 +294,7 @@ KeyValueReader::getInt(const std::string &key, int &value)
     catch (...) {
         value = 0;
         if (c_data->c_willAbort)
-            abortMessage("Error converting value to int", c_data->c_filename);
+            c_data->abortMessage("Error converting value to int");
         return StatusStringConversionError;
     }
     
@@ -283,7 +315,7 @@ KeyValueReader::getDouble(const std::string &key, double &value)
     if (status != StatusSuccess) {
         value = 0;
         if (c_data->c_willAbort)
-            abortMessage("Key not found", c_data->c_filename);
+            c_data->abortMessage("Key not found");
         return status;
     }
     
@@ -293,7 +325,7 @@ KeyValueReader::getDouble(const std::string &key, double &value)
     catch (...) {
         value = 0.0;
         if (c_data->c_willAbort)
-            abortMessage("Error converting value to double", c_data->c_filename);
+            c_data->abortMessage("Error converting value to double");
         return StatusStringConversionError;
     }
     
@@ -314,7 +346,7 @@ KeyValueReader::getFloat(const std::string &key, float &value)
     if (status != StatusSuccess) {
         value = 0;
         if (c_data->c_willAbort)
-            abortMessage("Key not found", c_data->c_filename);
+            c_data->abortMessage("Key not found");
         return status;
     }
     
@@ -324,7 +356,7 @@ KeyValueReader::getFloat(const std::string &key, float &value)
     catch (...) {
         value = 0.0f;
         if (c_data->c_willAbort)
-            abortMessage("Error converting value to float", c_data->c_filename);
+            c_data->abortMessage("Error converting value to float");
         return StatusStringConversionError;
     }
     
@@ -346,7 +378,7 @@ KeyValueReader::getBool(const std::string &key, bool &value)
     if (status != StatusSuccess) {
         value = 0;
         if (c_data->c_willAbort)
-            abortMessage("Key not found", c_data->c_filename);
+            c_data->abortMessage("Key not found");
         return status;
     }
     
@@ -364,7 +396,7 @@ KeyValueReader::getBool(const std::string &key, bool &value)
     
     // String conversion error if we get here
     if (c_data->c_willAbort)
-        abortMessage("Error converting value to bool", c_data->c_filename);
+        c_data->abortMessage("Error converting value to bool");
     return StatusStringConversionError;
 }
 

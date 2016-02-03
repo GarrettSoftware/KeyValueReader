@@ -10,6 +10,7 @@ public:
     // Status error values
     enum STATUS {
         StatusSuccess,
+        StatusAlreadyReadAFile,
         StatusOpenFileError,
         StatusParseFileError,
         StatusKeyNotFound,
