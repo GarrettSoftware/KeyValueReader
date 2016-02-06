@@ -161,6 +161,22 @@ bool parseLine(const string &line, string &outKey, string &outValue)
 }
 
 
+/*
+    findKey
+*/
+static
+int findKey(const vector<string> &keyVector, const string &key)
+{
+    for (size_t i = 0; i < keyVector.size(); i++) {
+        if (areStringsEqual(key, keyVector[i])) {
+            return i;
+        }
+    }
+    
+    return -1;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //                              Private Class Data
@@ -257,7 +273,7 @@ KeyValueReader::readFile(const string &filename)
         string value = "";
         bool parseOk = parseLine(line, key, value);
         
-        if (!parseOk) {
+        if (!parseOk || findKey(c_data->c_keyVector, key) >= 0) {
             status = StatusParseFileError;
             printf("Parse error in file %s on line %d\n", filename.c_str(), lineNum);
         }
