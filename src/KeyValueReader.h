@@ -32,14 +32,13 @@ class KeyValueReader final
 public:
     
     // Status error values
-    enum Status {
-        StatusSuccess,
-        StatusAlreadyReadAFile,
-        StatusFileNotRead,
-        StatusOpenFileError,
-        StatusParseFileError,
-        StatusKeyNotFound,
-        StatusStringConversionError
+    enum Exception {
+        ExceptionAlreadyReadAFile,
+        ExceptionFileNotRead,
+        ExceptionOpenFileError,
+        ExceptionParseFileError,
+        ExceptionKeyNotFound,
+        ExceptionStringConversionError
     };
     
     // Constructor/Destructor
@@ -51,14 +50,13 @@ public:
     KeyValueReader &operator=(const KeyValueReader &kvr) = delete;
     
     // Interface
-    Status readFile(const std::string &filename);
-    Status getString(const std::string &key, std::string &value);
-    Status getInt(const std::string &key, int &value);
-    Status getDouble(const std::string &key, double &value);
-    Status getFloat(const std::string &key, float &value);
-    Status getBool(const std::string &key, bool &value);
+    void readFile(const std::string &filename);
+    void getString(const std::string &key, std::string &value);
+    void getInt(const std::string &key, int &value);
+    void getDouble(const std::string &key, double &value);
+    void getFloat(const std::string &key, float &value);
+    void getBool(const std::string &key, bool &value);
     void print();
-    void setAbortOnError(bool willAbort);
     void reset();
     
 private:

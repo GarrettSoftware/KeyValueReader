@@ -1,38 +1,52 @@
 #include "../src/KeyValueReader.h"
+#include <string>
 
-int main()
+using namespace std;
+
+
+static
+void trySuccess(KeyValueReader &kvr, const string filename, const char test, string errors)
+{
+    try {
+        kvr.readFile(filename);
+    }
+    catch (...) {
+        errors += test;
+    }
+}
+
+static
+void tryFailure(KeyValueReader &kvr, const string filename, 
+                const KeyValueReader::Exception exceptionToMatch, 
+                const char test, string errors)
+{
+    try {
+        kvr.readFile(filename);
+        errors += test;
+    }
+    catch (KeyValueReader::Exception e) {
+        if (e != exceptionToMatch)
+            errors += test;
+    }
+}
+
+bool test1()
 {
     printf("--- Test 1 (reading a file) ---\n");
     KeyValueReader kvr;
-    KeyValueReader::Status status;
-    
+    string errors = "";
     
     // a
-    kvr.setAbortOnError(false);
-    status = kvr.readFile("test_does_not_exist.kv");
-    if (status == KeyValueReader::StatusOpenFileError)
-    	printf("   a: Passed\n");
-    else
-    	printf("   a: Failed\n");
-    
+    tryFailure(kvr, "test_does_not_exist.kv", KeyValueReader::ExceptionOpenFileError, 'a', errors);
     
     // b
     kvr.reset();
-    kvr.setAbortOnError(false);
-    status = kvr.readFile("test1a.kv");
-    if (status == KeyValueReader::StatusSuccess)
-    	printf("   b: Passed\n");
-	else 
-		printf("   b: Failed\n");
-	
+    trySuccess(kvr, "test1a.kv", 'b', errors);	
 	
 	// c
-    status = kvr.readFile("test1b.kv");
-    if (status == KeyValueReader::StatusAlreadyReadAFile)
-    	printf("   c: Passed\n");
-    else
-    	printf("   c: Failed\n");
+	tryFailure(kvr, "test1b.kv", KeyValueReader::ExceptionAlreadyReadAFile, 'c', errors);
     
-    
-    return 0;
+    if (errors == "")
+        return true;
+    return false;
 }

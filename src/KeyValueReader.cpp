@@ -220,34 +220,24 @@ int findKey(const vector<string> &keyVector, const string &key)
 */
 struct KeyValueReader::Private
 {
-    void abortMessage(const string &message);
+    void printMessage(const string &message);
     
     vector<string> c_keyVector;
     vector<string> c_valueVector;
     bool c_isFileRead;
-    bool c_willAbort;
     string c_filename;
 };
 
 
 /*
-    abortMessage
+    printMessage
     
     Causes an abort of the program due to an error.
 */
-void KeyValueReader::Private::abortMessage(const string &message)
+void KeyValueReader::Private::printMessage(const string &message)
 {
-    if (!c_willAbort) {
-    	if (message != "")
-    		printf("   %s\n", message.c_str());
-        return;
-    }
-    
-    printf("KeyValueReader error causing abort in file %s.\n",
-           c_filename.c_str());
-    if (message != "")
-    	printf("   %s\n", message.c_str());
-    abort();
+    printf("KeyValueReader error in file %s\n", c_filename.c_str());
+    printf("   %s\n", message.c_str());
 }
 
 
@@ -278,19 +268,18 @@ KeyValueReader::~KeyValueReader()
     Reads in a key-value file.
     Returns status of success or failure.
 */
-KeyValueReader::Status
-KeyValueReader::readFile(const string &filename)
+void KeyValueReader::readFile(const string &filename)
 {
     ifstream file;
     std::string line = "";
     int lineNum = 1;
-    Status status = StatusSuccess;
+    bool totalParseOk = true;
     
     
     // Check if already read a file
     if (c_data->c_isFileRead) {
-        c_data->abortMessage("Already read a file");
-        return StatusAlreadyReadAFile;
+        c_data->printMessage("Already read a file");
+        throw ExceptionAlreadyReadAFile;
     }
     
     
@@ -298,8 +287,8 @@ KeyValueReader::readFile(const string &filename)
     c_data->c_filename = filename;
     file.open(filename);
     if (!file.is_open()) {
-        c_data->abortMessage("Could not open file");
-        return StatusOpenFileError;
+        c_data->printMessage("Could not open file");
+        throw ExceptionOpenFileError;
     }
     
     
@@ -310,12 +299,16 @@ KeyValueReader::readFile(const string &filename)
         bool parseOk = parseLine(line, key, value);
         
         if (!parseOk) {
-            status = StatusParseFileError;
-            printf("   Parse error in file %s on line %d\n", filename.c_str(), lineNum);
+            totalParseOk = false;
+            string errorString = "Parse error on line ";
+            errorString += lineNum;
+            c_data->printMessage(errorString);
         }
         else if (findKey(c_data->c_keyVector, key) != KEY_NOT_FOUND) {
-        	status = StatusParseFileError;
-            printf("   Duplicate key in file %s on line %d\n", filename.c_str(), lineNum);
+            totalParseOk = false;
+        	string errorString = "Duplicate key on line ";
+            errorString += lineNum;
+            c_data->printMessage(errorString);
         }
         else if (key != "") {
             c_data->c_keyVector.push_back(key);
@@ -327,10 +320,10 @@ KeyValueReader::readFile(const string &filename)
     
     // Close file and return
     file.close();
-    if (status != StatusSuccess)
-        c_data->abortMessage("");
     c_data->c_isFileRead = true;
-    return status;
+    
+    if (!totalParseOk)
+        throw ExceptionParseFileError;
 }
 
 
@@ -341,8 +334,7 @@ KeyValueReader::readFile(const string &filename)
     Returns status of success or failure.
     If an error occurs, value is set to "".
 */
-KeyValueReader::Status
-KeyValueReader::getString(const std::string &key, std::string &value)
+void KeyValueReader::getString(const std::string &key, std::string &value)
 {
 	int keyIndex;
 	
@@ -351,19 +343,18 @@ KeyValueReader::getString(const std::string &key, std::string &value)
 	
 	// Check for file read
     if (!c_data->c_isFileRead) {
-    	c_data->abortMessage("File not read.");
-    	return StatusFileNotRead;
+    	c_data->printMessage("File not read.");
+    	throw ExceptionFileNotRead;
     }
     
     // Find value from key
     keyIndex = findKey(c_data->c_keyVector, key);
     if (keyIndex == KEY_NOT_FOUND) {
-    	c_data->abortMessage("Key not found");
-    	return StatusKeyNotFound;
+    	c_data->printMessage("Key not found");
+    	throw ExceptionKeyNotFound;
     }
     
     value = c_data->c_valueVector[keyIndex];
-    return StatusSuccess;
 }
 
 
@@ -374,37 +365,30 @@ KeyValueReader::getString(const std::string &key, std::string &value)
     Returns status of success or failure.
     If an error occurs, value is set to zero.
 */
-KeyValueReader::Status
-KeyValueReader::getInt(const std::string &key, int &value)
+void KeyValueReader::getInt(const std::string &key, int &value)
 {
     string valueString;
-    Status status;
     
     // Default value
     value = 0;
     
     // Check for file read
     if (!c_data->c_isFileRead) {
-    	c_data->abortMessage("File not read.");
-    	return StatusFileNotRead;
+    	c_data->printMessage("File not read.");
+    	throw ExceptionFileNotRead;
     }
     
     // Get value as string
-    status = getString(key, valueString);
-    if (status != StatusSuccess) {
-        return status;
-    }
+    getString(key, valueString);
     
     // Convert to int
     try {
         value = stoi(valueString);
     }
     catch (...) {
-        c_data->abortMessage("Error converting value to int");
-        return StatusStringConversionError;
+        c_data->printMessage("Error converting value to int");
+        throw ExceptionStringConversionError;
     }
-    
-    return StatusSuccess;
 }
 
 
@@ -415,37 +399,30 @@ KeyValueReader::getInt(const std::string &key, int &value)
     Returns status of success or failure.
     If an error occurs, value is set to zero.
 */
-KeyValueReader::Status
-KeyValueReader::getDouble(const std::string &key, double &value)
+void KeyValueReader::getDouble(const std::string &key, double &value)
 {
     string valueString;
-    Status status;
     
     // Default value
     value = 0.0;
     
     // Check for file read
     if (!c_data->c_isFileRead) {
-    	c_data->abortMessage("File not read.");
-    	return StatusFileNotRead;
+    	c_data->printMessage("File not read.");
+    	throw ExceptionFileNotRead;
     }
     
     // Get value as string
-    status = getString(key, valueString);
-    if (status != StatusSuccess) {
-        return status;
-    }
+    getString(key, valueString);
     
     // Convert to double
     try {
         value = stod(valueString);
     }
     catch (...) {
-        c_data->abortMessage("Error converting value to double");
-        return StatusStringConversionError;
+        c_data->printMessage("Error converting value to double");
+        throw ExceptionStringConversionError;
     }
-    
-    return StatusSuccess;
 }
 
 
@@ -456,37 +433,30 @@ KeyValueReader::getDouble(const std::string &key, double &value)
     Returns status of success or failure.
     If an error occurs, value is set to zero.
 */
-KeyValueReader::Status
-KeyValueReader::getFloat(const std::string &key, float &value)
+void KeyValueReader::getFloat(const std::string &key, float &value)
 {
     string valueString;
-    Status status;
     
     // Default value
     value = 0.0f;
     
     // Check for file read
     if (!c_data->c_isFileRead) {
-    	c_data->abortMessage("File not read.");
-    	return StatusFileNotRead;
+    	c_data->printMessage("File not read.");
+    	throw ExceptionFileNotRead;
     }
     
     // Get value as string
-    status = getString(key, valueString);
-    if (status != StatusSuccess) {
-        return status;
-    }
+    getString(key, valueString);
     
     // Convert value to float
     try {
         value = stof(valueString);
     }
     catch (...) {
-        c_data->abortMessage("Error converting value to float");
-        return StatusStringConversionError;
+        c_data->printMessage("Error converting value to float");
+        throw ExceptionStringConversionError;
     }
-    
-    return StatusSuccess;
 }
 
 
@@ -497,42 +467,37 @@ KeyValueReader::getFloat(const std::string &key, float &value)
     Returns status of success or failure.
     If an error occurs, value is set to false.
 */
-KeyValueReader::Status
-KeyValueReader::getBool(const std::string &key, bool &value)
+void KeyValueReader::getBool(const std::string &key, bool &value)
 {
     string valueString;
-    Status status;
     
     // Default value
     value = false;
     
     // Check for file read
     if (!c_data->c_isFileRead) {
-    	c_data->abortMessage("File not read.");
-    	return StatusFileNotRead;
+    	c_data->printMessage("File not read.");
+    	throw ExceptionFileNotRead;
     }
     
     // Get value from key as string
-    status = getString(key, valueString);
-    if (status != StatusSuccess) {
-        return status;
-    }
+    getString(key, valueString);
     
     // Check for true
     if (areStringsEqual(valueString, "true")) {
         value = true;
-        return StatusSuccess;
+        return;
     }
     
     // Check for false
     if (areStringsEqual(valueString, "false")) {
         value = false;
-        return StatusSuccess;
+        return;
     }
     
     // String conversion error if we get here
-    c_data->abortMessage("Error converting value to bool");
-    return StatusStringConversionError;
+    c_data->printMessage("Error converting value to bool");
+    throw ExceptionStringConversionError;
 }
 
 
@@ -547,8 +512,8 @@ void KeyValueReader::print()
     
     // Check for file read
     if (!c_data->c_isFileRead) {
-    	printf("No file has been read.\n\n");
-    	return;
+    	c_data->printMessage("File not read.");
+    	throw ExceptionFileNotRead;
     }
     
     // Print KeyValueReader data
@@ -561,17 +526,6 @@ void KeyValueReader::print()
 
 
 /*
-    setAbortOnError
-    
-    Sets whether the KeyValueReader will abort the program if an error is detected.
-*/
-void KeyValueReader::setAbortOnError(bool willAbort)
-{
-    c_data->c_willAbort = willAbort;
-}
-
-
-/*
     reset
     
     Resets the KeyValueReader to an uninitialized state.
@@ -579,7 +533,6 @@ void KeyValueReader::setAbortOnError(bool willAbort)
 void KeyValueReader::reset()
 {
 	c_data->c_isFileRead = false;
-    c_data->c_willAbort = true;
     c_data->c_filename = "";
     c_data->c_keyVector.clear();
     c_data->c_valueVector.clear();
