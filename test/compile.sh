@@ -1,1 +1,8 @@
-g++ --std=c++11 -Wall main.cpp test1.cpp ../src/KeyValueReader.cpp -o test.x 
+SOURCES="main.cpp \
+         TestHelpers.cpp \
+         ../src/KeyValueReader.cpp \
+         test1.cpp \
+         test2.cpp \
+         test3.cpp"
+
+g++ --std=c++11 -Wall $SOURCES -o test.x 

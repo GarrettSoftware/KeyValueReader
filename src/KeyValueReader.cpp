@@ -98,7 +98,7 @@ bool areStringsEqual(const string &s1, const string &s2)
 /*
     popToken
     
-    A token is made up of a-z, A-z, 0-9, and {+,-,_,.}.
+    A token is made up of a-z, A-Z, 0-9, and {+,-,_,.}.
     Takes the token out of 'line' and puts it in 'token'.
 */
 static
@@ -263,31 +263,51 @@ KeyValueReader::~KeyValueReader()
 
 
 /*
+    reset
+    
+    Resets the KeyValueReader to an uninitialized state.
+*/
+void KeyValueReader::reset()
+{
+	c_data->c_isFileRead = false;
+    c_data->c_filename = "";
+    c_data->c_keyVector.clear();
+    c_data->c_valueVector.clear();
+}
+
+
+/*
     readFile
     
     Reads in a key-value file.
-    Returns status of success or failure.
+    Throws an error if appropriate.
 */
 void KeyValueReader::readFile(const string &filename)
 {
     ifstream file;
-    std::string line = "";
+    string line = "";
     int lineNum = 1;
     bool totalParseOk = true;
+    string oldFilename = c_data->c_filename;
+    
+    
+    // Set filename (used in printMessage)
+    c_data->c_filename = filename;
     
     
     // Check if already read a file
     if (c_data->c_isFileRead) {
         c_data->printMessage("Already read a file");
+        c_data->c_filename = oldFilename;
         throw ExceptionAlreadyReadAFile;
     }
     
     
     // Open file
-    c_data->c_filename = filename;
     file.open(filename);
     if (!file.is_open()) {
         c_data->printMessage("Could not open file");
+        c_data->c_filename = oldFilename;
         throw ExceptionOpenFileError;
     }
     
@@ -298,18 +318,23 @@ void KeyValueReader::readFile(const string &filename)
         string value = "";
         bool parseOk = parseLine(line, key, value);
         
+        // Check parse is ok
         if (!parseOk) {
             totalParseOk = false;
             string errorString = "Parse error on line ";
-            errorString += lineNum;
+            errorString += to_string(lineNum);
             c_data->printMessage(errorString);
         }
+        
+        // Check if duplicate key
         else if (findKey(c_data->c_keyVector, key) != KEY_NOT_FOUND) {
             totalParseOk = false;
         	string errorString = "Duplicate key on line ";
-            errorString += lineNum;
+            errorString += to_string(lineNum);
             c_data->printMessage(errorString);
         }
+        
+        // Add key/value if line had one
         else if (key != "") {
             c_data->c_keyVector.push_back(key);
             c_data->c_valueVector.push_back(value);
@@ -331,12 +356,12 @@ void KeyValueReader::readFile(const string &filename)
     getString
     
     Gets string value from key.
-    Returns status of success or failure.
+    Throws an error if appropriate.
     If an error occurs, value is set to "".
 */
 void KeyValueReader::getString(const std::string &key, std::string &value)
 {
-	int keyIndex;
+	int keyIndex = 0;
 	
 	// Default value
     value = "";
@@ -362,7 +387,7 @@ void KeyValueReader::getString(const std::string &key, std::string &value)
     getInt
     
     Gets integer value from key.
-    Returns status of success or failure.
+    Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
 void KeyValueReader::getInt(const std::string &key, int &value)
@@ -371,12 +396,6 @@ void KeyValueReader::getInt(const std::string &key, int &value)
     
     // Default value
     value = 0;
-    
-    // Check for file read
-    if (!c_data->c_isFileRead) {
-    	c_data->printMessage("File not read.");
-    	throw ExceptionFileNotRead;
-    }
     
     // Get value as string
     getString(key, valueString);
@@ -396,7 +415,7 @@ void KeyValueReader::getInt(const std::string &key, int &value)
     getDouble
     
     Gets double value from key.
-    Returns status of success or failure.
+    Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
 void KeyValueReader::getDouble(const std::string &key, double &value)
@@ -405,12 +424,6 @@ void KeyValueReader::getDouble(const std::string &key, double &value)
     
     // Default value
     value = 0.0;
-    
-    // Check for file read
-    if (!c_data->c_isFileRead) {
-    	c_data->printMessage("File not read.");
-    	throw ExceptionFileNotRead;
-    }
     
     // Get value as string
     getString(key, valueString);
@@ -430,7 +443,7 @@ void KeyValueReader::getDouble(const std::string &key, double &value)
     getFloat
     
     Gets float value from key.
-    Returns status of success or failure.
+    Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
 void KeyValueReader::getFloat(const std::string &key, float &value)
@@ -439,12 +452,6 @@ void KeyValueReader::getFloat(const std::string &key, float &value)
     
     // Default value
     value = 0.0f;
-    
-    // Check for file read
-    if (!c_data->c_isFileRead) {
-    	c_data->printMessage("File not read.");
-    	throw ExceptionFileNotRead;
-    }
     
     // Get value as string
     getString(key, valueString);
@@ -464,7 +471,7 @@ void KeyValueReader::getFloat(const std::string &key, float &value)
     getBool
     
     Gets boolean value from key.
-    Returns status of success or failure.
+    Throws an error if appropriate.
     If an error occurs, value is set to false.
 */
 void KeyValueReader::getBool(const std::string &key, bool &value)
@@ -473,12 +480,6 @@ void KeyValueReader::getBool(const std::string &key, bool &value)
     
     // Default value
     value = false;
-    
-    // Check for file read
-    if (!c_data->c_isFileRead) {
-    	c_data->printMessage("File not read.");
-    	throw ExceptionFileNotRead;
-    }
     
     // Get value from key as string
     getString(key, valueString);
@@ -505,6 +506,7 @@ void KeyValueReader::getBool(const std::string &key, bool &value)
     print
     
     Prints entire set of key/value pairs.
+    Throws an error if appropriate.
 */
 void KeyValueReader::print()
 {
@@ -524,19 +526,6 @@ void KeyValueReader::print()
     printf("\n");
 }
 
-
-/*
-    reset
-    
-    Resets the KeyValueReader to an uninitialized state.
-*/
-void KeyValueReader::reset()
-{
-	c_data->c_isFileRead = false;
-    c_data->c_filename = "";
-    c_data->c_keyVector.clear();
-    c_data->c_valueVector.clear();
-}
 
 
 

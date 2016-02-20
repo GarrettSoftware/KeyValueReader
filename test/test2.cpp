@@ -1,50 +1,36 @@
 #include "../src/KeyValueReader.h"
+#include "TestHelpers.h"
 
-int main()
+using namespace std;
+
+bool test2()
 {
-    printf("--- Test 2 (parsing) ---\n");
     KeyValueReader kvr;
-    KeyValueReader::Status status;
+    string errors = "";
     
+    // Print test 2
+    printf("--- Test 2 (parsing) ---\n");
     
     // a
-    kvr.setAbortOnError(false);
-    status = kvr.readFile("test2a.kv");
-    if (status == KeyValueReader::StatusSuccess)
-    	printf("a: Passed\n");
-    else
-    	printf("a: Failed\n");
-    
+    trySuccess(kvr, "test2a.kv", 'a', errors);
     
     // b
     kvr.reset();
-    kvr.setAbortOnError(false);
-    status = kvr.readFile("test2b.kv");
-    if (status == KeyValueReader::StatusParseFileError)
-    	printf("b: Passed\n");
-	else 
-		printf("b: Failed\n");
-	
+    tryFailure(kvr, "test2b.kv", 'b', errors, 
+	           KeyValueReader::ExceptionParseFileError);
 	
 	// c
 	kvr.reset();
-    kvr.setAbortOnError(false);
-    status = kvr.readFile("test2c.kv");
-    if (status == KeyValueReader::StatusParseFileError)
-    	printf("c: Passed\n");
-	else 
-		printf("c: Failed\n");
-	
+	tryFailure(kvr, "test2c.kv", 'c', errors, 
+	           KeyValueReader::ExceptionParseFileError);
 	
 	// d
 	kvr.reset();
-    kvr.setAbortOnError(false);
-    status = kvr.readFile("test2d.kv");
-    if (status == KeyValueReader::StatusParseFileError)
-    	printf("d: Passed\n");
-	else 
-		printf("d: Failed\n");
+	tryFailure(kvr, "test2d.kv", 'd', errors, 
+	           KeyValueReader::ExceptionParseFileError);
     
-    
-    return 0;
+    // Return
+    if (errors == "")
+        return true;
+    return false;
 }

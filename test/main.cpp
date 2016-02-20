@@ -1,17 +1,31 @@
 #include <stdio.h>
 
 bool test1();
+bool test2();
+bool test3();
+
+static
+void printResult(bool result, int test)
+{
+    if(result == false)
+        printf("   Test %d: failed\n", test);
+    else
+        printf("   Test %d: passed\n", test);
+}
+
 
 int main()
 {
-    bool result1 = test1();
+    printf("\n\n");  bool result1 = test1();
+    printf("\n\n");  bool result2 = test2();
+    printf("\n\n");  bool result3 = test3();
     
     
-    printf("\n\n*** TEST RESULTS ***\n");
-    if(result1 == false)
-        printf("   Test 1: failed\n");
-    else
-        printf("   Test 1: passed\n");
+    printf("\n\n****** TEST RESULTS ******\n");
+    printResult(result1, 1);
+    printResult(result2, 2);
+    printResult(result3, 3);
+    printf("\n\n");
     
     return 0;
 }
