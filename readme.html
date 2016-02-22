@@ -8,13 +8,19 @@ body {width: 80ex; margin: 2ex}
 
 
 
-<h1>KeyValueReader - simple key-value file reader</h1>
+<h1>KeyValueReader 1.0 (beta)</h1>
+
+<h2>Releases</h2>
+
+<p>Each release is tagged.
+The main branch should contain the latest release.
+The easiest way to get the latest release is to either <code>git clone</code> the repository or select the "Download ZIP" button from the main page.</p>
 
 <h2>Overview</h2>
 
 <p>This software implements a single class to easily add basic file input to your programs.
 Just put KeyValueReader.cpp and KeyValueReader.h in your project and add the extra sources to your build scripts.
-Basic usage looks like the following (with error checking omitted for simplicity).</p>
+Basic usage looks like the following.</p>
 
 <pre><code>string runType;
 int problemSize;
@@ -22,59 +28,64 @@ double tolerance;
 bool doExtraThing;
 
 KeyValueReader kvr;
-kvr.readFile("input.kv");
-kvr.getString("RUN_TYPE", runType);
-kvr.getInt("PROBLEM_SIZE", problemSize);
-kvr.getDouble("TOLERANCE", tolerance);
-kvr.getBool("DO_EXTRA_THING", doExtraThing);
+try {
+    kvr.readFile("input.kv");
+    kvr.getString("RUN_TYPE", runType);
+    kvr.getInt("PROBLEM_SIZE", problemSize);
+    kvr.getDouble("TOLERANCE", tolerance);
+    kvr.getBool("DO_EXTRA_THING", doExtraThing);
+}
+catch (KeyValueReader::Exception e) {
+    // Catch errors
+}
 </code></pre>
 
 <h2>Interface</h2>
 
-<pre><code>enum STATUS {
-    StatusSuccess,
-    StatusOpenFileError,
-    StatusParseFileError,
-    StatusKeyNotFound,
-    StatusStringConversionError
+<pre><code>enum Exception {
+    ExceptionAlreadyReadAFile,
+    ExceptionFileNotRead,
+    ExceptionOpenFileError,
+    ExceptionParseFileError,
+    ExceptionKeyNotFound,
+    ExceptionStringConversionError
 };
 
-explicit KeyValueReader();
-~KeyValueReader();
-
-STATUS readFile(const std::string &amp;filename);
-STATUS getString(const std::string &amp;key, std::string &amp;value);
-STATUS getInt(const std::string &amp;key, int &amp;value);
-STATUS getDouble(const std::string &amp;key, double &amp;value);
-STATUS getFloat(const std::string &amp;key, float &amp;value);
-STATUS getBool(const std::string &amp;key, bool &amp;value);
+void readFile(const std::string &amp;filename);
+void getString(const std::string &amp;key, std::string &amp;value);
+void getInt(const std::string &amp;key, int &amp;value);
+void getDouble(const std::string &amp;key, double &amp;value);
+void getFloat(const std::string &amp;key, float &amp;value);
+void getBool(const std::string &amp;key, bool &amp;value);
 void print();
+void reset();
 </code></pre>
 
 <h3>readFile</h3>
 
 <p>This function reads and parses the file given by <code>filename</code>.
-It will return <code>StatusSuccess</code> if the file could be read and parsed correctly.
-If the file cannot be opened, <code>StatusOpenFileError</code> is returned.
-If there is a parse error, <code>StatusParseFileError</code> is returned, but in this case, some lines may be parsed correctly and those lines will be stored by the KeyValueReader.
-In the case of parse errors, a line is printed to standard out specifying the file and line of the error.</p>
+If a file has already been parse, <code>ExceptionAlreadyReadAFile</code> is thrown.
+If the file cannot be opened, <code>ExceptionOpenFileError</code> is thrown.
+If there is a parse error, <code>ExceptionParseFileError</code> is returned, but in this case, some lines may be parsed correctly and those lines will be stored by the KeyValueReader.
+In the case of parse errors, a line is printed to standard out specifying the line number of the error.</p>
 
 <h3>getString, getInt, ...</h3>
 
 <p>These functions take a <code>key</code> as input and return the appropriate <code>value</code> in the KeyValueReader.
-If the <code>key</code> does not exist, <code>StatusKeyNotFound</code> is returned.
+If a file has not been read, <code>ExceptionFileNotRead</code> is thrown.
+If the <code>key</code> does not exist, <code>ExceptionKeyNotFound</code> is thrown.
 If something other than getString is called, a conversion from a string value to the appropriate value is made.
-In this case it is possible to get a <code>StatusStringConversionError</code> returned.
-If there is no error, <code>StatusSuccess</code> is returned.
+In this case it is possible to get an <code>ExceptionStringConversionError</code> returned.
 Note, the key search is not case sensitive, but the value returned from getString does not change the case of <code>value</code> from the input file.</p>
 
 <h3>print</h3>
 
-<p>This function prints all the key/value pairs in the KeyValueReader.</p>
+<p>This function prints all the key/value pairs in the KeyValueReader.
+If a file has not been read, <code>ExceptionFileNotRead</code> is thrown.</p>
 
-<h3>Error checking macro</h3>
+<h3>reset</h3>
 
-<p>To do...</p>
+<p>Resets the KeyValueReader to a state where a new file may be read.</p>
 
 <h2>File Format</h2>
 
