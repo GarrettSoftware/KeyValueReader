@@ -1,4 +1,4 @@
-# KeyValueReader 1.0 (beta)
+# KeyValueReader 1.0
 
 ## Releases
 Each release is tagged.
@@ -7,8 +7,12 @@ The easiest way to get the latest release is to either `git clone` the repositor
 
 ## Overview 
 This software implements a single class to easily add basic file input to your programs.
-Just put KeyValueReader.cpp and KeyValueReader.h in your project and add the extra sources to your build scripts.
+Just put KeyValueReader.cpp and KeyValueReader.h in your project and add the extra sources to your build.
+Note: this software requires the C++11 standard.
+For g++ you will need the flag `--std=c++11`.
+
 Basic usage looks like the following.
+For simple programs, you may not want to use a try/catch block and simply let the program abort from any exception that occurs.
 
     string runType;
     int problemSize;

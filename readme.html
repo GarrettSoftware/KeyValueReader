@@ -8,7 +8,7 @@ body {width: 80ex; margin: 2ex}
 
 
 
-<h1>KeyValueReader 1.0 (beta)</h1>
+<h1>KeyValueReader 1.0</h1>
 
 <h2>Releases</h2>
 
@@ -19,8 +19,12 @@ The easiest way to get the latest release is to either <code>git clone</code> th
 <h2>Overview</h2>
 
 <p>This software implements a single class to easily add basic file input to your programs.
-Just put KeyValueReader.cpp and KeyValueReader.h in your project and add the extra sources to your build scripts.
-Basic usage looks like the following.</p>
+Just put KeyValueReader.cpp and KeyValueReader.h in your project and add the extra sources to your build.
+Note: this software requires the C++11 standard.
+For g++ you will need the flag <code>--std=c++11</code>.</p>
+
+<p>Basic usage looks like the following.
+For simple programs, you may not want to use a try/catch block and simply let the program abort from any exception that occurs.</p>
 
 <pre><code>string runType;
 int problemSize;
