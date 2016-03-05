@@ -31,7 +31,7 @@ int problemSize;
 double tolerance;
 bool doExtraThing;
 
-KeyValueReader kvr;
+CKG_Utils::KeyValueReader kvr;
 try {
     kvr.readFile("input.kv");
     kvr.getString("RUN_TYPE", runType);
@@ -56,12 +56,12 @@ catch (KeyValueReader::Exception e) {
 };
 
 void readFile(const std::string &amp;filename);
-void getString(const std::string &amp;key, std::string &amp;value);
-void getInt(const std::string &amp;key, int &amp;value);
-void getDouble(const std::string &amp;key, double &amp;value);
-void getFloat(const std::string &amp;key, float &amp;value);
-void getBool(const std::string &amp;key, bool &amp;value);
-void print();
+void getString(const std::string &amp;key, std::string &amp;value) const;
+void getInt(const std::string &amp;key, int &amp;value) const;
+void getDouble(const std::string &amp;key, double &amp;value) const;
+void getFloat(const std::string &amp;key, float &amp;value) const;
+void getBool(const std::string &amp;key, bool &amp;value) const;
+void print() const;
 void reset();
 </code></pre>
 
