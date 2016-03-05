@@ -5,7 +5,7 @@ using namespace std;
 
 bool test2()
 {
-    KeyValueReader kvr;
+    CKG_Utils::KeyValueReader kvr;
     string errors = "";
     
     // Print test 2
@@ -17,17 +17,17 @@ bool test2()
     // b
     kvr.reset();
     tryFailure(kvr, "test2b.kv", 'b', errors, 
-	           KeyValueReader::ExceptionParseFileError);
+	           CKG_Utils::KeyValueReader::ExceptionParseFileError);
 	
 	// c
 	kvr.reset();
 	tryFailure(kvr, "test2c.kv", 'c', errors, 
-	           KeyValueReader::ExceptionParseFileError);
+	           CKG_Utils::KeyValueReader::ExceptionParseFileError);
 	
 	// d
 	kvr.reset();
 	tryFailure(kvr, "test2d.kv", 'd', errors, 
-	           KeyValueReader::ExceptionParseFileError);
+	           CKG_Utils::KeyValueReader::ExceptionParseFileError);
     
     // Return
     if (errors == "")

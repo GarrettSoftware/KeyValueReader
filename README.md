@@ -1,4 +1,4 @@
-# KeyValueReader 1.0
+# KeyValueReader 1.1
 
 ## Releases
 Each release is tagged.

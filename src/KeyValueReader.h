@@ -27,6 +27,8 @@ SOFTWARE.
 
 #include <string>
 
+namespace CKG_Utils {
+
 class KeyValueReader final
 {
 public:
@@ -51,17 +53,19 @@ public:
     
     // Interface
     void readFile(const std::string &filename);
-    void getString(const std::string &key, std::string &value);
-    void getInt(const std::string &key, int &value);
-    void getDouble(const std::string &key, double &value);
-    void getFloat(const std::string &key, float &value);
-    void getBool(const std::string &key, bool &value);
-    void print();
+    void getString(const std::string &key, std::string &value) const;
+    void getInt(const std::string &key, int &value) const;
+    void getDouble(const std::string &key, double &value) const;
+    void getFloat(const std::string &key, float &value) const;
+    void getBool(const std::string &key, bool &value) const;
+    void print() const;
     void reset();
     
 private:
     struct Private;
     Private *c_data;
 };
+
+} // End namespace
 
 #endif

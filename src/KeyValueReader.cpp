@@ -31,6 +31,8 @@ using namespace std;
 
 static const int KEY_NOT_FOUND = -1;
 
+namespace CKG_Utils {
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -359,7 +361,7 @@ void KeyValueReader::readFile(const string &filename)
     Throws an error if appropriate.
     If an error occurs, value is set to "".
 */
-void KeyValueReader::getString(const std::string &key, std::string &value)
+void KeyValueReader::getString(const std::string &key, std::string &value) const
 {
 	int keyIndex = 0;
 	
@@ -390,7 +392,7 @@ void KeyValueReader::getString(const std::string &key, std::string &value)
     Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
-void KeyValueReader::getInt(const std::string &key, int &value)
+void KeyValueReader::getInt(const std::string &key, int &value) const
 {
     string valueString;
     
@@ -418,7 +420,7 @@ void KeyValueReader::getInt(const std::string &key, int &value)
     Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
-void KeyValueReader::getDouble(const std::string &key, double &value)
+void KeyValueReader::getDouble(const std::string &key, double &value) const
 {
     string valueString;
     
@@ -446,7 +448,7 @@ void KeyValueReader::getDouble(const std::string &key, double &value)
     Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
-void KeyValueReader::getFloat(const std::string &key, float &value)
+void KeyValueReader::getFloat(const std::string &key, float &value) const
 {
     string valueString;
     
@@ -474,7 +476,7 @@ void KeyValueReader::getFloat(const std::string &key, float &value)
     Throws an error if appropriate.
     If an error occurs, value is set to false.
 */
-void KeyValueReader::getBool(const std::string &key, bool &value)
+void KeyValueReader::getBool(const std::string &key, bool &value) const
 {
     string valueString;
     
@@ -508,7 +510,7 @@ void KeyValueReader::getBool(const std::string &key, bool &value)
     Prints entire set of key/value pairs.
     Throws an error if appropriate.
 */
-void KeyValueReader::print()
+void KeyValueReader::print() const
 {
     printf("\n--- KeyValueReader Data (%s) ---\n", c_data->c_filename.c_str());
     
@@ -527,5 +529,5 @@ void KeyValueReader::print()
 }
 
 
-
+} // End namespace
 

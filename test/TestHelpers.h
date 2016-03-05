@@ -4,51 +4,51 @@
 #include <string>
 #include "../src/KeyValueReader.h"
 
-void trySuccess(KeyValueReader &kvr, const std::string &filename, 
+void trySuccess(CKG_Utils::KeyValueReader &kvr, const std::string &filename, 
                 const char test, std::string &errors);
 
-void tryFailure(KeyValueReader &kvr, const std::string &filename, 
+void tryFailure(CKG_Utils::KeyValueReader &kvr, const std::string &filename, 
                 const char test, std::string &errors, 
-                const KeyValueReader::Exception exceptionToMatch);
+                const CKG_Utils::KeyValueReader::Exception exceptionToMatch);
 
-void tryKeyValueSuccessString(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueSuccessString(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                               const std::string &value, const char test,
                               std::string &errors);
 
-void tryKeyValueSuccessInt(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueSuccessInt(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                            const int value, const char test,
                            std::string &errors);
 
-void tryKeyValueSuccessDouble(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueSuccessDouble(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                               const double value, const char test,
                               std::string &errors);
 
-void tryKeyValueSuccessFloat(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueSuccessFloat(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                              const float value, const char test,
                              std::string &errors);
 
-void tryKeyValueSuccessBool(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueSuccessBool(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                             const bool value, const char test,
                             std::string &errors);
 
-void tryKeyValueFailureString(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueFailureString(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                               const char test, std::string &errors, 
-                              const KeyValueReader::Exception exceptionToMatch);
+                              const CKG_Utils::KeyValueReader::Exception exceptionToMatch);
 
-void tryKeyValueFailureInt(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueFailureInt(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                            const char test, std::string &errors, 
-                           const KeyValueReader::Exception exceptionToMatch);
+                           const CKG_Utils::KeyValueReader::Exception exceptionToMatch);
 
-void tryKeyValueFailureDouble(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueFailureDouble(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                               const char test, std::string &errors, 
-                              const KeyValueReader::Exception exceptionToMatch);
+                              const CKG_Utils::KeyValueReader::Exception exceptionToMatch);
 
-void tryKeyValueFailureFloat(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueFailureFloat(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                              const char test, std::string &errors, 
-                             const KeyValueReader::Exception exceptionToMatch);
+                             const CKG_Utils::KeyValueReader::Exception exceptionToMatch);
 
-void tryKeyValueFailureBool(KeyValueReader &kvr, const std::string &key,
+void tryKeyValueFailureBool(CKG_Utils::KeyValueReader &kvr, const std::string &key,
                             const char test, std::string &errors, 
-                            const KeyValueReader::Exception exceptionToMatch);
+                            const CKG_Utils::KeyValueReader::Exception exceptionToMatch);
 
 #endif

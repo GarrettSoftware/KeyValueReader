@@ -5,7 +5,7 @@ using namespace std;
 
 bool test3()
 {
-    KeyValueReader kvr;
+    CKG_Utils::KeyValueReader kvr;
     string errors = "";
     
     // Print test 1
@@ -19,7 +19,7 @@ bool test3()
     
     // b
     tryKeyValueFailureString(kvr, "key_dne", 'b', errors, 
-                             KeyValueReader::ExceptionKeyNotFound);
+                             CKG_Utils::KeyValueReader::ExceptionKeyNotFound);
     
     
     // c
@@ -27,11 +27,11 @@ bool test3()
     
     // d
     tryKeyValueFailureInt(kvr, "key1", 'd', errors, 
-                          KeyValueReader::ExceptionStringConversionError);
+                          CKG_Utils::KeyValueReader::ExceptionStringConversionError);
     
     // e
     tryKeyValueFailureInt(kvr, "key_dne", 'd', errors, 
-                          KeyValueReader::ExceptionKeyNotFound);
+                          CKG_Utils::KeyValueReader::ExceptionKeyNotFound);
     
     
     // f
@@ -39,11 +39,11 @@ bool test3()
     
     // g
     tryKeyValueFailureDouble(kvr, "key1", 'g', errors, 
-                             KeyValueReader::ExceptionStringConversionError);
+                             CKG_Utils::KeyValueReader::ExceptionStringConversionError);
     
     // h
     tryKeyValueFailureDouble(kvr, "key_dne", 'h', errors, 
-                             KeyValueReader::ExceptionKeyNotFound);
+                             CKG_Utils::KeyValueReader::ExceptionKeyNotFound);
     
     
     // i
@@ -51,11 +51,11 @@ bool test3()
     
     // j
     tryKeyValueFailureFloat(kvr, "key1", 'j', errors, 
-                            KeyValueReader::ExceptionStringConversionError);
+                            CKG_Utils::KeyValueReader::ExceptionStringConversionError);
     
     // k
     tryKeyValueFailureFloat(kvr, "key_dne", 'k', errors, 
-                            KeyValueReader::ExceptionKeyNotFound);
+                            CKG_Utils::KeyValueReader::ExceptionKeyNotFound);
     
     
     // l
@@ -63,11 +63,11 @@ bool test3()
     
     // m
     tryKeyValueFailureBool(kvr, "key1", 'm', errors, 
-                           KeyValueReader::ExceptionStringConversionError);
+                           CKG_Utils::KeyValueReader::ExceptionStringConversionError);
     
     // n
     tryKeyValueFailureBool(kvr, "key_dne", 'n', errors, 
-                           KeyValueReader::ExceptionKeyNotFound);
+                           CKG_Utils::KeyValueReader::ExceptionKeyNotFound);
     
     
     // Return

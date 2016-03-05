@@ -5,7 +5,7 @@ using namespace std;
 
 bool test1()
 {
-    KeyValueReader kvr;
+    CKG_Utils::KeyValueReader kvr;
     string errors = "";
     
     // Print test 1
@@ -13,7 +13,7 @@ bool test1()
     
     // a
     tryFailure(kvr, "test_does_not_exist.kv", 'a', errors, 
-               KeyValueReader::ExceptionOpenFileError);
+               CKG_Utils::KeyValueReader::ExceptionOpenFileError);
     
     // b
     kvr.reset();
@@ -21,7 +21,7 @@ bool test1()
 	
 	// c
 	tryFailure(kvr, "test1b.kv", 'c', errors, 
-	           KeyValueReader::ExceptionAlreadyReadAFile);
+	           CKG_Utils::KeyValueReader::ExceptionAlreadyReadAFile);
     
     // Return
     if (errors == "")
