@@ -1,0 +1,5 @@
+- Put version in readme.md
+- run ./create_html.sh to create html documentation
+- commit changes
+- Tag release in git (git tag v#.#)
+- Push release and tag (git push     git push --tags)
