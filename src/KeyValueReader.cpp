@@ -23,191 +23,15 @@ SOFTWARE.
 */
 
 #include "KeyValueReader.h"
+#include "utils.h"
 #include <vector>
 #include <fstream>
 #include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
-static const int KEY_NOT_FOUND = -1;
-
-namespace CKG_Utils {
-
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-//                              Helper Functions
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-
-/*
-    getRidOfComments
-    
-    Deletes # and everything after that in the string.
-*/
-static
-void getRidOfComments(string &line)
-{
-    size_t commentStart = line.find('#');
-    if (commentStart != string::npos)
-        line = line.substr(0, commentStart);
-}
-
-
-/*
-    deleteWhitespace
-    
-    Deletes all the initial whitespace in the string.
-    Returns number of whitespace characters.
-*/
-static
-size_t deleteWhitespace(string &line)
-{
-    static const string whitespace = " \t";
-    size_t pos = 0;
-    
-    for (pos = 0; pos < line.size(); pos++) {
-        if (whitespace.find(line[pos]) == string::npos) 
-            break;
-    }
-    line = line.substr(pos);
-    return pos;
-}
-
-
-/*
-    areStringsEqual
-    
-    Returns true if the two strings are equal.
-    Neglects upper/lower case.
-*/
-static
-bool areStringsEqual(const string &s1, const string &s2)
-{
-    if (s1.size() != s2.size())
-        return false;
-    
-    for (size_t i = 0; i < s1.size(); i++) {
-        if (toupper(s1[i]) != toupper(s2[i]))
-            return false;
-    }
-    
-    return true;
-}
-
-
-/*
-    popToken
-    
-    A token is made up of a-z, A-Z, 0-9, and {+,-,_,.}.
-    Takes the token out of 'line' and puts it in 'token'.
-*/
-static
-void popToken(string &line, string &token)
-{
-    static const string allowableChar = "abcdefghijklmnopqrstuvwxyz"
-                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "0123456789"
-                                        "+-_.";
-    size_t pos = 0;
-    token = "";
-    
-    for (pos = 0; pos < line.size(); pos++) {
-        if (allowableChar.find(line[pos]) == string::npos) 
-            break;
-    }
-    token = line.substr(0, pos);
-    line = line.substr(pos);
-}
-
-
-/*
-    parseLine
-    
-    From a line of input, sets outKey and outValue.
-    If the line parses correctly, function returns true.
-    Otherwise function returns false.
-    
-    In the case of true return and the line contains a key/value pair, outKey and
-    outValue contain that data.
-    In the case of true return and the line contains only whitespace or comments,
-    outKey and outValue are set to "".
-    In the case of false return, outKey and outValue are set to "".
-*/
-static
-bool parseLine(const string &line, string &outKey, string &outValue)
-{
-    string parsedLine = line;
-    size_t numWhitespace = 0;
-    string key = "";
-    string value = "";
-    
-    // Set outKey, outValue to default ""
-    outKey = "";
-    outValue = "";
-    
-    // Get rid of comments in line
-    getRidOfComments(parsedLine);
-    
-    // Delete whitespace
-    deleteWhitespace(parsedLine);
-    
-    // Check for empty line
-    if (parsedLine.size() == 0) {
-        return true;
-    }
-    
-    // Get key
-    popToken(parsedLine, key);
-    if (key == "") {
-    	return false;
-    }
-    
-    // Delete whitespace
-    numWhitespace = deleteWhitespace(parsedLine);
-    if (numWhitespace == 0) {
-    	return false;
-    }
-    
-    // Get value
-    popToken(parsedLine, value);
-    if (value == "") {
-    	return false;
-    }
-    
-    // Delete whitespace
-    deleteWhitespace(parsedLine);
-    
-    // Check for non-empty line
-    if (parsedLine.size() != 0) {
-    	return false;
-    }
-    
-    // If here, the line parsed correctly
-    outKey = key;
-    outValue = value;
-    return true;
-}
-
-
-/*
-    findKey
-    
-    Returns the index of the key in the keyVector.
-    If key is not found, returns KEY_NOT_FOUND.
-*/
-static
-int findKey(const vector<string> &keyVector, const string &key)
-{
-    for (size_t i = 0; i < keyVector.size(); i++) {
-        if (areStringsEqual(key, keyVector[i])) {
-            return i;
-        }
-    }
-    
-    return KEY_NOT_FOUND;
-}
+namespace GarrettSoftware {
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -324,7 +148,7 @@ void KeyValueReader::readFile(const string &filename)
         if (!parseOk) {
             totalParseOk = false;
             string errorString = "Parse error on line ";
-            errorString += to_string(lineNum);
+            errorString += lineNum;
             c_data->printMessage(errorString);
         }
         
@@ -332,7 +156,7 @@ void KeyValueReader::readFile(const string &filename)
         else if (findKey(c_data->c_keyVector, key) != KEY_NOT_FOUND) {
             totalParseOk = false;
         	string errorString = "Duplicate key on line ";
-            errorString += to_string(lineNum);
+            errorString += lineNum;
             c_data->printMessage(errorString);
         }
         

@@ -4,7 +4,7 @@
 
 extern "C" {
 
-using namespace CKG_Utils;
+using namespace GarrettSoftware;
 
 void* KVR_createKeyValueReader()
 {

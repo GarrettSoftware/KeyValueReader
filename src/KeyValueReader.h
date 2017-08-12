@@ -27,9 +27,9 @@ SOFTWARE.
 
 #include <string>
 
-namespace CKG_Utils {
+namespace GarrettSoftware {
 
-class KeyValueReader final
+class KeyValueReader 
 {
 public:
     
@@ -44,12 +44,12 @@ public:
     };
     
     // Constructor/Destructor
-    explicit KeyValueReader();
+    KeyValueReader();
     ~KeyValueReader();
     
     // Don't allow copy or assignment operators
-    KeyValueReader(const KeyValueReader &kvr) = delete;
-    KeyValueReader &operator=(const KeyValueReader &kvr) = delete;
+    //KeyValueReader(const KeyValueReader &kvr) = delete;
+    //KeyValueReader &operator=(const KeyValueReader &kvr) = delete;
     
     // Interface
     void readFile(const std::string &filename);

@@ -6,9 +6,9 @@
 /////  Open File Tests  /////
 TEST(OpenFileTests, DoesNotExistTest)
 {
-    CKG_Utils::KeyValueReader kvr;
-    CKG_Utils::KeyValueReader::Exception e = 
-        CKG_Utils::KeyValueReader::ExceptionOpenFileError;
+    GarrettSoftware::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader::Exception e = 
+        GarrettSoftware::KeyValueReader::ExceptionOpenFileError;
 
     EXPECT_TRUE(tryFailure(kvr, "test_does_not_exist.kv", e));
 }
@@ -16,16 +16,16 @@ TEST(OpenFileTests, DoesNotExistTest)
 
 TEST(OpenFileTests, FileExistsTest)
 {
-    CKG_Utils::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader kvr;
     EXPECT_TRUE(trySuccess(kvr, "test_open.kv"));
 }
 
 
 TEST(OpenFileTests, FileAlreadyOpenTest)
 {
-    CKG_Utils::KeyValueReader kvr;
-    CKG_Utils::KeyValueReader::Exception e = 
-        CKG_Utils::KeyValueReader::ExceptionAlreadyReadAFile;
+    GarrettSoftware::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader::Exception e = 
+        GarrettSoftware::KeyValueReader::ExceptionAlreadyReadAFile;
 
     EXPECT_TRUE(trySuccess(kvr, "test_open.kv"));
     EXPECT_TRUE(tryFailure(kvr, "test_open.kv", e));
@@ -38,16 +38,16 @@ TEST(OpenFileTests, FileAlreadyOpenTest)
 /////  Parse File Tests  /////
 TEST(ParseFileTests, ParseSuccessTest)
 {
-    CKG_Utils::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader kvr;
     EXPECT_TRUE(trySuccess(kvr, "test_parse1.kv"));
 }
 
 
 TEST(ParseFileTests, ParseFailTest1)
 {
-    CKG_Utils::KeyValueReader kvr;
-    CKG_Utils::KeyValueReader::Exception e = 
-        CKG_Utils::KeyValueReader::ExceptionParseFileError;
+    GarrettSoftware::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader::Exception e = 
+        GarrettSoftware::KeyValueReader::ExceptionParseFileError;
 
     EXPECT_TRUE(tryFailure(kvr, "test_parse2.kv", e));
 }
@@ -55,9 +55,9 @@ TEST(ParseFileTests, ParseFailTest1)
 
 TEST(ParseFileTests, ParseFailTest2)
 {
-    CKG_Utils::KeyValueReader kvr;
-    CKG_Utils::KeyValueReader::Exception e = 
-        CKG_Utils::KeyValueReader::ExceptionParseFileError;
+    GarrettSoftware::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader::Exception e = 
+        GarrettSoftware::KeyValueReader::ExceptionParseFileError;
 
     EXPECT_TRUE(tryFailure(kvr, "test_parse3.kv", e));
 }
@@ -65,9 +65,9 @@ TEST(ParseFileTests, ParseFailTest2)
 
 TEST(ParseFileTests, ParseFailTest3)
 {
-    CKG_Utils::KeyValueReader kvr;
-    CKG_Utils::KeyValueReader::Exception e = 
-        CKG_Utils::KeyValueReader::ExceptionParseFileError;
+    GarrettSoftware::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader::Exception e = 
+        GarrettSoftware::KeyValueReader::ExceptionParseFileError;
 
     EXPECT_TRUE(tryFailure(kvr, "test_parse4.kv", e));
 }
@@ -76,7 +76,7 @@ TEST(ParseFileTests, ParseFailTest3)
 /////  Find Key/Value Tests  /////
 TEST(KeyValueTests, KeyValueSuccessTest)
 {
-    CKG_Utils::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader kvr;
     
     EXPECT_TRUE(trySuccess(kvr, "test_kv.kv"));
 
@@ -90,9 +90,9 @@ TEST(KeyValueTests, KeyValueSuccessTest)
 
 TEST(KeyValueTests, KeyDNETest)
 {
-    CKG_Utils::KeyValueReader kvr;
-    CKG_Utils::KeyValueReader::Exception e = 
-        CKG_Utils::KeyValueReader::ExceptionKeyNotFound;
+    GarrettSoftware::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader::Exception e = 
+        GarrettSoftware::KeyValueReader::ExceptionKeyNotFound;
 
     EXPECT_TRUE(trySuccess(kvr, "test_kv.kv"));
 
@@ -106,9 +106,9 @@ TEST(KeyValueTests, KeyDNETest)
 
 TEST(KeyValueTests, ValueConversionTest)
 {
-    CKG_Utils::KeyValueReader kvr;
-    CKG_Utils::KeyValueReader::Exception e = 
-        CKG_Utils::KeyValueReader::ExceptionStringConversionError;
+    GarrettSoftware::KeyValueReader kvr;
+    GarrettSoftware::KeyValueReader::Exception e = 
+        GarrettSoftware::KeyValueReader::ExceptionStringConversionError;
 
     EXPECT_TRUE(trySuccess(kvr, "test_kv.kv"));
 

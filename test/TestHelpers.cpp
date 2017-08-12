@@ -4,7 +4,7 @@
 /*
     Read file tests
 */
-bool trySuccess(CKG_Utils::KeyValueReader &kvr, 
+bool trySuccess(GarrettSoftware::KeyValueReader &kvr, 
                 const std::string &filename)
 {
     try {
@@ -15,15 +15,15 @@ bool trySuccess(CKG_Utils::KeyValueReader &kvr,
     return false;
 }
 
-bool tryFailure(CKG_Utils::KeyValueReader &kvr, 
+bool tryFailure(GarrettSoftware::KeyValueReader &kvr, 
                 const std::string &filename, 
-                const CKG_Utils::KeyValueReader::Exception e)
+                const GarrettSoftware::KeyValueReader::Exception e)
 {
     try {
         kvr.readFile(filename);
         return false;
     }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
+    catch (GarrettSoftware::KeyValueReader::Exception e1) {
         if (e1 != e)
             return false;
     }
@@ -35,7 +35,7 @@ bool tryFailure(CKG_Utils::KeyValueReader &kvr,
     Key Value Tests
 */
 // String
-bool tryKeyValueSuccessString(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueSuccessString(GarrettSoftware::KeyValueReader &kvr, 
                               const std::string &key,
                               const std::string &value)
 {
@@ -52,7 +52,7 @@ bool tryKeyValueSuccessString(CKG_Utils::KeyValueReader &kvr,
     return true;
 }
 // int
-bool tryKeyValueSuccessInt(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueSuccessInt(GarrettSoftware::KeyValueReader &kvr, 
                            const std::string &key,
                            const int value)
 {
@@ -69,7 +69,7 @@ bool tryKeyValueSuccessInt(CKG_Utils::KeyValueReader &kvr,
     return true;
 }
 // double
-bool tryKeyValueSuccessDouble(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueSuccessDouble(GarrettSoftware::KeyValueReader &kvr, 
                               const std::string &key,
                               const double value)
 {
@@ -86,7 +86,7 @@ bool tryKeyValueSuccessDouble(CKG_Utils::KeyValueReader &kvr,
     return true;
 }
 // float
-bool tryKeyValueSuccessFloat(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueSuccessFloat(GarrettSoftware::KeyValueReader &kvr, 
                              const std::string &key,
                              const float value)
 {
@@ -103,7 +103,7 @@ bool tryKeyValueSuccessFloat(CKG_Utils::KeyValueReader &kvr,
     return true;
 }
 // bool
-bool tryKeyValueSuccessBool(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueSuccessBool(GarrettSoftware::KeyValueReader &kvr, 
                             const std::string &key,
                             const bool value)
 {
@@ -121,9 +121,9 @@ bool tryKeyValueSuccessBool(CKG_Utils::KeyValueReader &kvr,
 }
 
 // string
-bool tryKeyValueFailureString(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueFailureString(GarrettSoftware::KeyValueReader &kvr, 
                               const std::string &key,
-                              const CKG_Utils::KeyValueReader::Exception e)
+                              const GarrettSoftware::KeyValueReader::Exception e)
 {
     std::string value1;
     
@@ -131,7 +131,7 @@ bool tryKeyValueFailureString(CKG_Utils::KeyValueReader &kvr,
         kvr.getString(key, value1);
         return false;
     }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
+    catch (GarrettSoftware::KeyValueReader::Exception e1) {
         if (e1 != e)
             return false;
     }
@@ -139,9 +139,9 @@ bool tryKeyValueFailureString(CKG_Utils::KeyValueReader &kvr,
 }
 
 // int
-bool tryKeyValueFailureInt(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueFailureInt(GarrettSoftware::KeyValueReader &kvr, 
                            const std::string &key,
-                           const CKG_Utils::KeyValueReader::Exception e)
+                           const GarrettSoftware::KeyValueReader::Exception e)
 {
     int value1;
     
@@ -149,7 +149,7 @@ bool tryKeyValueFailureInt(CKG_Utils::KeyValueReader &kvr,
         kvr.getInt(key, value1);
         return false;
     }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
+    catch (GarrettSoftware::KeyValueReader::Exception e1) {
         if (e1 != e)
             return false;
     }
@@ -157,9 +157,9 @@ bool tryKeyValueFailureInt(CKG_Utils::KeyValueReader &kvr,
 }
 
 // double
-bool tryKeyValueFailureDouble(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueFailureDouble(GarrettSoftware::KeyValueReader &kvr, 
                               const std::string &key,
-                              const CKG_Utils::KeyValueReader::Exception e)
+                              const GarrettSoftware::KeyValueReader::Exception e)
 {
     double value1;
     
@@ -167,7 +167,7 @@ bool tryKeyValueFailureDouble(CKG_Utils::KeyValueReader &kvr,
         kvr.getDouble(key, value1);
         return false;
     }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
+    catch (GarrettSoftware::KeyValueReader::Exception e1) {
         if (e1 != e)
             return false;
     }
@@ -175,9 +175,9 @@ bool tryKeyValueFailureDouble(CKG_Utils::KeyValueReader &kvr,
 }
 
 // float
-bool tryKeyValueFailureFloat(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueFailureFloat(GarrettSoftware::KeyValueReader &kvr, 
                              const std::string &key,
-                             const CKG_Utils::KeyValueReader::Exception e)
+                             const GarrettSoftware::KeyValueReader::Exception e)
 {
     float value1;
     
@@ -185,7 +185,7 @@ bool tryKeyValueFailureFloat(CKG_Utils::KeyValueReader &kvr,
         kvr.getFloat(key, value1);
         return false;
     }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
+    catch (GarrettSoftware::KeyValueReader::Exception e1) {
         if (e1 != e)
             return false;
     }
@@ -193,9 +193,9 @@ bool tryKeyValueFailureFloat(CKG_Utils::KeyValueReader &kvr,
 }
 
 // bool
-bool tryKeyValueFailureBool(CKG_Utils::KeyValueReader &kvr, 
+bool tryKeyValueFailureBool(GarrettSoftware::KeyValueReader &kvr, 
                             const std::string &key,
-                            const CKG_Utils::KeyValueReader::Exception e)
+                            const GarrettSoftware::KeyValueReader::Exception e)
 {
     bool value1;
     
@@ -203,7 +203,7 @@ bool tryKeyValueFailureBool(CKG_Utils::KeyValueReader &kvr,
         kvr.getBool(key, value1);
         return false;
     }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
+    catch (GarrettSoftware::KeyValueReader::Exception e1) {
         if (e1 != e)
             return false;
     }
