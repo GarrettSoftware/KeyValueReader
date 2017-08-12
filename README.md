@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 # KeyValueReader
-=======
+
 # KeyValueReader 1.1
 
 ## Releases
@@ -101,7 +100,3 @@ An example of an input file might look like the following.
     DO_EXTRA_THING  true
 
 
-
-
-
->>>>>>> upstream/master
