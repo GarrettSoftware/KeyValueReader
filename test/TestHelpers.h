@@ -2,53 +2,53 @@
 #define __TEST_HELPERS_H__
 
 #include <string>
-#include "../src/KeyValueReader.h"
+#include "../include/KeyValueReader.h"
 
-bool trySuccess(GarrettSoftware::KeyValueReader &kvr, 
+bool trySuccess(void *kvr, 
                 const std::string &filename);
 
-bool tryFailure(GarrettSoftware::KeyValueReader &kvr, 
+bool tryFailure(void *kvr, 
                 const std::string &filename, 
-                const GarrettSoftware::KeyValueReader::Exception e);
+                const KVR_Error error);
 
-bool tryKeyValueSuccessString(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessString(void *kvr, 
                               const std::string &key,
                               const std::string &value);
 
-bool tryKeyValueSuccessInt(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessInt(void *kvr, 
                            const std::string &key,
                            const int value);
 
-bool tryKeyValueSuccessDouble(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessDouble(void *kvr, 
                               const std::string &key,
                               const double value);
 
-bool tryKeyValueSuccessFloat(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessFloat(void *kvr, 
                              const std::string &key,
                              const float value);
 
-bool tryKeyValueSuccessBool(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessBool(void *kvr, 
                             const std::string &key,
                             const bool value);
 
-bool tryKeyValueFailureString(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureString(void *kvr, 
                               const std::string &key,
-                              const GarrettSoftware::KeyValueReader::Exception e);
+                              const KVR_Error error);
 
-bool tryKeyValueFailureInt(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureInt(void *kvr, 
                            const std::string &key,
-                           const GarrettSoftware::KeyValueReader::Exception e);
+                           const KVR_Error error);
 
-bool tryKeyValueFailureDouble(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureDouble(void *kvr, 
                               const std::string &key,
-                              const GarrettSoftware::KeyValueReader::Exception e);
+                              const KVR_Error error);
 
-bool tryKeyValueFailureFloat(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureFloat(void *kvr, 
                              const std::string &key,
-                             const GarrettSoftware::KeyValueReader::Exception e);
+                             const KVR_Error error);
 
-bool tryKeyValueFailureBool(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureBool(void *kvr, 
                             const std::string &key,
-                            const GarrettSoftware::KeyValueReader::Exception e);
+                            const KVR_Error error);
 
 #endif

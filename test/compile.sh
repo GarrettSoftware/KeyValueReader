@@ -1,6 +1,6 @@
 SOURCES="main.cpp \
          TestHelpers.cpp \
-         ../libKeyValueReader.a"
+         ../lib/libKeyValueReader.a"
 
 cd ..
 make

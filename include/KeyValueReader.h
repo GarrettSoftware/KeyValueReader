@@ -22,12 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __KEY_VALUE_READER_C_H
-#define __KEY_VALUE_READER_C_H
+#ifndef __KEY_VALUE_READER_H
+#define __KEY_VALUE_READER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <string>
+#include <vector>
 
 enum KVR_Error {
     KVR_Error_None,
@@ -39,21 +38,55 @@ enum KVR_Error {
     KVR_Error_StringConversionError,
 };
 
-void* KVR_createKeyValueReader();
-void KVR_deleteKeyValueReader(void *kvr);
 
-KVR_Error KVR_readFile(void *kvr, const char *filename);
-KVR_Error KVR_getString(void *kvr, const char *key, char *value);
-KVR_Error KVR_getInt(void *kvr, const char *key, int *value);
-KVR_Error KVR_getDouble(void *kvr, const char *key, double *value);
-KVR_Error KVR_getFloat(void *kvr, const char *key, float *value);
-KVR_Error KVR_getBool(void *kvr, const char *key, int *value);
-KVR_Error KVR_print();
-KVR_Error KVR_reset();
+class KeyValueReader 
+{
+public:
+    
+    // Constructor
+    KeyValueReader();
+    
+        
+//private:
+    std::vector<std::string> c_keyVector;
+    std::vector<std::string> c_valueVector;
+    bool c_isFileRead;
+    std::string c_filename;
 
-#ifdef __cplusplus
-}
+    void printMessage(const std::string &message) const;
+    KVR_Error getStringPrivate(const char *key, std::string &value) const;
+};
+
+void *createKeyValueReader();
+void deleteKeyValueReader(
+    void *kvr);
+
+// Interface
+KVR_Error readFile(
+    void *kvr, 
+    const char *filename);
+KVR_Error getString(
+    const void *kvr, 
+    const char *key, 
+    char *value);
+KVR_Error getInt(
+    const void *kvr, 
+    const char *key, 
+    int &value);
+KVR_Error getDouble(
+    const void *kvr, 
+    const char *key, 
+    double &value);
+KVR_Error getFloat(
+    const void *kvr, 
+    const char *key, 
+    float &value);
+KVR_Error getBool(
+    const void *kvr, 
+    const char *key, 
+    bool &value);
+KVR_Error print(
+    const void *kvr); 
+
+
 #endif
-
-#endif
-

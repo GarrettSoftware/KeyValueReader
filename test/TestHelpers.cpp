@@ -4,29 +4,22 @@
 /*
     Read file tests
 */
-bool trySuccess(GarrettSoftware::KeyValueReader &kvr, 
+bool trySuccess(void *kvr, 
                 const std::string &filename)
 {
-    try {
-        kvr.readFile(filename);
+    KVR_Error error = readFile(kvr, filename.c_str());
+    if (error == KVR_Error_None)
         return true;
-    }
-    catch (...) { }
     return false;
 }
 
-bool tryFailure(GarrettSoftware::KeyValueReader &kvr, 
+bool tryFailure(void *kvr, 
                 const std::string &filename, 
-                const GarrettSoftware::KeyValueReader::Exception e)
+                const KVR_Error error)
 {
-    try {
-        kvr.readFile(filename);
+    KVR_Error error1 = readFile(kvr, filename.c_str());
+    if (error != error1)
         return false;
-    }
-    catch (GarrettSoftware::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
@@ -35,178 +28,140 @@ bool tryFailure(GarrettSoftware::KeyValueReader &kvr,
     Key Value Tests
 */
 // String
-bool tryKeyValueSuccessString(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessString(void *kvr, 
                               const std::string &key,
                               const std::string &value)
 {
-    std::string value1;
-    
-    try {
-        kvr.getString(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    char valueChars[100];
+    KVR_Error error = getString(kvr, key.c_str(), valueChars);
+    std::string value1(valueChars);
+
+    if (error != KVR_Error_None)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 // int
-bool tryKeyValueSuccessInt(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessInt(void *kvr, 
                            const std::string &key,
                            const int value)
 {
     int value1;
-    
-    try {
-        kvr.getInt(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    KVR_Error error = getInt(kvr, key.c_str(), value1);
+
+    if (error != KVR_Error_None)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 // double
-bool tryKeyValueSuccessDouble(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessDouble(void *kvr, 
                               const std::string &key,
                               const double value)
 {
     double value1;
-    
-    try {
-        kvr.getDouble(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    KVR_Error error = getDouble(kvr, key.c_str(), value1);
+
+    if (error != KVR_Error_None)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 // float
-bool tryKeyValueSuccessFloat(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessFloat(void *kvr, 
                              const std::string &key,
                              const float value)
 {
     float value1;
-    
-    try {
-        kvr.getFloat(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    KVR_Error error = getFloat(kvr, key.c_str(), value1);
+
+    if (error != KVR_Error_None)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 // bool
-bool tryKeyValueSuccessBool(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueSuccessBool(void *kvr, 
                             const std::string &key,
                             const bool value)
 {
     bool value1;
-    
-    try {
-        kvr.getBool(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    KVR_Error error = getBool(kvr, key.c_str(), value1);
+
+    if (error != KVR_Error_None)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 
 // string
-bool tryKeyValueFailureString(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureString(void *kvr, 
                               const std::string &key,
-                              const GarrettSoftware::KeyValueReader::Exception e)
+                              const KVR_Error error)
 {
-    std::string value1;
-    
-    try {
-        kvr.getString(key, value1);
+    char valueChars[100];
+    KVR_Error error1 = getString(kvr, key.c_str(), valueChars);
+    std::string value1(valueChars);
+
+    if (error != error1)
         return false;
-    }
-    catch (GarrettSoftware::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
 // int
-bool tryKeyValueFailureInt(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureInt(void *kvr, 
                            const std::string &key,
-                           const GarrettSoftware::KeyValueReader::Exception e)
+                           const KVR_Error error)
 {
     int value1;
-    
-    try {
-        kvr.getInt(key, value1);
+    KVR_Error error1 = getInt(kvr, key.c_str(), value1);
+
+    if (error != error1)
         return false;
-    }
-    catch (GarrettSoftware::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
 // double
-bool tryKeyValueFailureDouble(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureDouble(void *kvr, 
                               const std::string &key,
-                              const GarrettSoftware::KeyValueReader::Exception e)
+                              const KVR_Error error)
 {
     double value1;
-    
-    try {
-        kvr.getDouble(key, value1);
+    KVR_Error error1 = getDouble(kvr, key.c_str(), value1);
+
+    if (error != error1)
         return false;
-    }
-    catch (GarrettSoftware::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
 // float
-bool tryKeyValueFailureFloat(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureFloat(void *kvr, 
                              const std::string &key,
-                             const GarrettSoftware::KeyValueReader::Exception e)
+                             const KVR_Error error)
 {
     float value1;
-    
-    try {
-        kvr.getFloat(key, value1);
+    KVR_Error error1 = getFloat(kvr, key.c_str(), value1);
+
+    if (error != error1)
         return false;
-    }
-    catch (GarrettSoftware::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
 // bool
-bool tryKeyValueFailureBool(GarrettSoftware::KeyValueReader &kvr, 
+bool tryKeyValueFailureBool(void *kvr, 
                             const std::string &key,
-                            const GarrettSoftware::KeyValueReader::Exception e)
+                            const KVR_Error error)
 {
     bool value1;
-    
-    try {
-        kvr.getBool(key, value1);
+    KVR_Error error1 = getBool(kvr, key.c_str(), value1);
+
+    if (error != error1)
         return false;
-    }
-    catch (GarrettSoftware::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
