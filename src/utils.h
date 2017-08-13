@@ -28,6 +28,8 @@ SOFTWARE.
 #include <string>
 #include <vector>
 
+namespace KVR_UTILS {
+
 static const int KEY_NOT_FOUND = -1;
 
 bool areStringsEqual(
@@ -42,6 +44,8 @@ bool parseLine(
     const std::string &line, 
     std::string &outKey, 
     std::string &outValue);
+
+} // End namespace
 
 #endif
 

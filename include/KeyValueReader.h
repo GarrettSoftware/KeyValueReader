@@ -25,67 +25,46 @@ SOFTWARE.
 #ifndef __KEY_VALUE_READER_H
 #define __KEY_VALUE_READER_H
 
-#include <string>
-#include <vector>
 
-enum KVR_Error {
-    KVR_Error_None,
-    KVR_Error_AlreadyReadAFile,
-    KVR_Error_FileNotRead,
-    KVR_Error_OpenFileError,
-    KVR_Error_ParseFileError,
-    KVR_Error_KeyNotFound,
-    KVR_Error_StringConversionError,
+enum KVR_Status {
+    KVR_Success,
+    KVR_AlreadyReadAFile,
+    KVR_FileNotRead,
+    KVR_OpenFileError,
+    KVR_ParseFileError,
+    KVR_KeyNotFound,
+    KVR_ConversionError,
 };
 
 
-class KeyValueReader 
-{
-public:
-    
-    // Constructor
-    KeyValueReader();
-    
-        
-//private:
-    std::vector<std::string> c_keyVector;
-    std::vector<std::string> c_valueVector;
-    bool c_isFileRead;
-    std::string c_filename;
-
-    void printMessage(const std::string &message) const;
-    KVR_Error getStringPrivate(const char *key, std::string &value) const;
-};
-
-void *createKeyValueReader();
-void deleteKeyValueReader(
+void *KVR_create();
+void KVR_delete(
     void *kvr);
 
-// Interface
-KVR_Error readFile(
+KVR_Status KVR_readFile(
     void *kvr, 
     const char *filename);
-KVR_Error getString(
+KVR_Status KVR_getString(
     const void *kvr, 
     const char *key, 
     char *value);
-KVR_Error getInt(
+KVR_Status KVR_getInt(
     const void *kvr, 
     const char *key, 
     int &value);
-KVR_Error getDouble(
+KVR_Status KVR_getDouble(
     const void *kvr, 
     const char *key, 
     double &value);
-KVR_Error getFloat(
+KVR_Status KVR_getFloat(
     const void *kvr, 
     const char *key, 
     float &value);
-KVR_Error getBool(
+KVR_Status KVR_getBool(
     const void *kvr, 
     const char *key, 
     bool &value);
-KVR_Error print(
+KVR_Status KVR_print(
     const void *kvr); 
 
 

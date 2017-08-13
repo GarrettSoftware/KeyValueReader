@@ -87,6 +87,8 @@ static void popToken(
 }
 
 
+namespace KVR_UTILS {
+
 /*
     areStringsEqual
     
@@ -199,3 +201,4 @@ int findKey(
     return KEY_NOT_FOUND;
 }
 
+} // End KVR_UTILS namespace

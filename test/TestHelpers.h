@@ -9,7 +9,7 @@ bool trySuccess(void *kvr,
 
 bool tryFailure(void *kvr, 
                 const std::string &filename, 
-                const KVR_Error error);
+                const KVR_Status error);
 
 bool tryKeyValueSuccessString(void *kvr, 
                               const std::string &key,
@@ -33,22 +33,22 @@ bool tryKeyValueSuccessBool(void *kvr,
 
 bool tryKeyValueFailureString(void *kvr, 
                               const std::string &key,
-                              const KVR_Error error);
+                              const KVR_Status error);
 
 bool tryKeyValueFailureInt(void *kvr, 
                            const std::string &key,
-                           const KVR_Error error);
+                           const KVR_Status error);
 
 bool tryKeyValueFailureDouble(void *kvr, 
                               const std::string &key,
-                              const KVR_Error error);
+                              const KVR_Status error);
 
 bool tryKeyValueFailureFloat(void *kvr, 
                              const std::string &key,
-                             const KVR_Error error);
+                             const KVR_Status error);
 
 bool tryKeyValueFailureBool(void *kvr, 
                             const std::string &key,
-                            const KVR_Error error);
+                            const KVR_Status error);
 
 #endif

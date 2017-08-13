@@ -7,17 +7,17 @@
 bool trySuccess(void *kvr, 
                 const std::string &filename)
 {
-    KVR_Error error = readFile(kvr, filename.c_str());
-    if (error == KVR_Error_None)
+    KVR_Status error = KVR_readFile(kvr, filename.c_str());
+    if (error == KVR_Success)
         return true;
     return false;
 }
 
 bool tryFailure(void *kvr, 
                 const std::string &filename, 
-                const KVR_Error error)
+                const KVR_Status error)
 {
-    KVR_Error error1 = readFile(kvr, filename.c_str());
+    KVR_Status error1 = KVR_readFile(kvr, filename.c_str());
     if (error != error1)
         return false;
     return true;
@@ -33,10 +33,10 @@ bool tryKeyValueSuccessString(void *kvr,
                               const std::string &value)
 {
     char valueChars[100];
-    KVR_Error error = getString(kvr, key.c_str(), valueChars);
+    KVR_Status error = KVR_getString(kvr, key.c_str(), valueChars);
     std::string value1(valueChars);
 
-    if (error != KVR_Error_None)
+    if (error != KVR_Success)
         return false;
     if (value1 != value)
         return false;
@@ -48,9 +48,9 @@ bool tryKeyValueSuccessInt(void *kvr,
                            const int value)
 {
     int value1;
-    KVR_Error error = getInt(kvr, key.c_str(), value1);
+    KVR_Status error = KVR_getInt(kvr, key.c_str(), value1);
 
-    if (error != KVR_Error_None)
+    if (error != KVR_Success)
         return false;
     if (value1 != value)
         return false;
@@ -62,9 +62,9 @@ bool tryKeyValueSuccessDouble(void *kvr,
                               const double value)
 {
     double value1;
-    KVR_Error error = getDouble(kvr, key.c_str(), value1);
+    KVR_Status error = KVR_getDouble(kvr, key.c_str(), value1);
 
-    if (error != KVR_Error_None)
+    if (error != KVR_Success)
         return false;
     if (value1 != value)
         return false;
@@ -76,9 +76,9 @@ bool tryKeyValueSuccessFloat(void *kvr,
                              const float value)
 {
     float value1;
-    KVR_Error error = getFloat(kvr, key.c_str(), value1);
+    KVR_Status error = KVR_getFloat(kvr, key.c_str(), value1);
 
-    if (error != KVR_Error_None)
+    if (error != KVR_Success)
         return false;
     if (value1 != value)
         return false;
@@ -90,9 +90,9 @@ bool tryKeyValueSuccessBool(void *kvr,
                             const bool value)
 {
     bool value1;
-    KVR_Error error = getBool(kvr, key.c_str(), value1);
+    KVR_Status error = KVR_getBool(kvr, key.c_str(), value1);
 
-    if (error != KVR_Error_None)
+    if (error != KVR_Success)
         return false;
     if (value1 != value)
         return false;
@@ -102,10 +102,10 @@ bool tryKeyValueSuccessBool(void *kvr,
 // string
 bool tryKeyValueFailureString(void *kvr, 
                               const std::string &key,
-                              const KVR_Error error)
+                              const KVR_Status error)
 {
     char valueChars[100];
-    KVR_Error error1 = getString(kvr, key.c_str(), valueChars);
+    KVR_Status error1 = KVR_getString(kvr, key.c_str(), valueChars);
     std::string value1(valueChars);
 
     if (error != error1)
@@ -116,10 +116,10 @@ bool tryKeyValueFailureString(void *kvr,
 // int
 bool tryKeyValueFailureInt(void *kvr, 
                            const std::string &key,
-                           const KVR_Error error)
+                           const KVR_Status error)
 {
     int value1;
-    KVR_Error error1 = getInt(kvr, key.c_str(), value1);
+    KVR_Status error1 = KVR_getInt(kvr, key.c_str(), value1);
 
     if (error != error1)
         return false;
@@ -129,10 +129,10 @@ bool tryKeyValueFailureInt(void *kvr,
 // double
 bool tryKeyValueFailureDouble(void *kvr, 
                               const std::string &key,
-                              const KVR_Error error)
+                              const KVR_Status error)
 {
     double value1;
-    KVR_Error error1 = getDouble(kvr, key.c_str(), value1);
+    KVR_Status error1 = KVR_getDouble(kvr, key.c_str(), value1);
 
     if (error != error1)
         return false;
@@ -142,10 +142,10 @@ bool tryKeyValueFailureDouble(void *kvr,
 // float
 bool tryKeyValueFailureFloat(void *kvr, 
                              const std::string &key,
-                             const KVR_Error error)
+                             const KVR_Status error)
 {
     float value1;
-    KVR_Error error1 = getFloat(kvr, key.c_str(), value1);
+    KVR_Status error1 = KVR_getFloat(kvr, key.c_str(), value1);
 
     if (error != error1)
         return false;
@@ -155,10 +155,10 @@ bool tryKeyValueFailureFloat(void *kvr,
 // bool
 bool tryKeyValueFailureBool(void *kvr, 
                             const std::string &key,
-                            const KVR_Error error)
+                            const KVR_Status error)
 {
     bool value1;
-    KVR_Error error1 = getBool(kvr, key.c_str(), value1);
+    KVR_Status error1 = KVR_getBool(kvr, key.c_str(), value1);
 
     if (error != error1)
         return false;
