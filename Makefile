@@ -1,6 +1,6 @@
 # Change this line for different compiler options
 # This library requires compiling with the C++11 standard
-CC = g++ --std=c++11
+CC = g++ --std=c++11 -Wall
 
 
 .PHONY: libKeyValueReader

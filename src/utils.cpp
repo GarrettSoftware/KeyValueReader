@@ -90,6 +90,20 @@ static void popToken(
 namespace KVR_UTILS {
 
 /*
+    printMessage
+    
+    Prints message and key/value file name in a standard way.
+*/
+void printMessage(
+    const std::string &filename, 
+    const std::string &message)
+{
+    printf("KeyValueReader error in file %s\n", filename.c_str());
+    printf("   %s\n", message.c_str());
+}
+
+
+/*
     areStringsEqual
     
     Returns true if the two strings are equal.

@@ -25,6 +25,9 @@ SOFTWARE.
 #ifndef __KEY_VALUE_READER_H
 #define __KEY_VALUE_READER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 enum KVR_Status {
     KVR_Success,
@@ -34,16 +37,38 @@ enum KVR_Status {
     KVR_ParseFileError,
     KVR_KeyNotFound,
     KVR_ConversionError,
+    KVR_AllocationError
 };
 
 
-void *KVR_create();
-void KVR_delete(
-    void *kvr);
+/*
+    Create/delete KeyValueReader strucuture.
+*/
+KVR_Status KVR_create(
+    void **kvr);
+KVR_Status KVR_delete(
+    void **kvr);
 
+/*
+    Parse key/value file and store the data.
+*/
 KVR_Status KVR_readFile(
     void *kvr, 
     const char *filename);
+
+
+/*
+    Get the maximum length in characters of all values.
+    Useful before using KVR_getString to know how large to 
+    make value char array.
+*/
+KVR_Status KVR_getMaxValueLength(
+    const void *kvr,
+    int *length);
+
+/*
+    Get value from key.
+*/
 KVR_Status KVR_getString(
     const void *kvr, 
     const char *key, 
@@ -64,8 +89,15 @@ KVR_Status KVR_getBool(
     const void *kvr, 
     const char *key, 
     bool &value);
+
+/*
+    Print the contents of all keys/values.
+*/
 KVR_Status KVR_print(
     const void *kvr); 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

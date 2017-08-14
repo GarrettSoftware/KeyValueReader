@@ -32,6 +32,10 @@ namespace KVR_UTILS {
 
 static const int KEY_NOT_FOUND = -1;
 
+void printMessage(
+    const std::string &filename,
+    const std::string &message);
+
 bool areStringsEqual(
     const std::string &s1, 
     const std::string &s2);

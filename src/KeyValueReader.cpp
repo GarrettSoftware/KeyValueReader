@@ -47,25 +47,9 @@ struct KVR_Data
 
 
 /*
-    printMessage
-    
-    Causes an abort of the program due to an error.
-*/
-static
-void printMessage(
-    const std::string &filename, 
-    const std::string &message)
-{
-    printf("KeyValueReader error in file %s\n", filename.c_str());
-    printf("   %s\n", message.c_str());
-}
-
-
-/*
     getStringPrivate
     
     Gets string value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to "".
 */
 static
@@ -81,14 +65,14 @@ KVR_Status getStringPrivate(
 	
     // Check for file read
     if (!kvr->c_isFileRead) {
-    	printMessage(kvr->c_filename, "File not read.");
+    	KVR_UTILS::printMessage(kvr->c_filename, "File not read.");
         return KVR_FileNotRead;
     }
     
     // Find value from key
     keyIndex = KVR_UTILS::findKey(kvr->c_keyVector, key);
     if (keyIndex == KVR_UTILS::KEY_NOT_FOUND) {
-    	printMessage(kvr->c_filename, "Key not found");
+    	KVR_UTILS::printMessage(kvr->c_filename, "Key not found");
         return KVR_KeyNotFound;
     }
     
@@ -97,11 +81,11 @@ KVR_Status getStringPrivate(
 }
 
 
+// Public C interface
+extern "C" {
+
 /*
-    readFile
-    
-    Reads in a key-value file.
-    Throws an error if appropriate.
+    KVR_readFile
 */
 KVR_Status KVR_readFile(
     void *kvrVoid, 
@@ -112,17 +96,11 @@ KVR_Status KVR_readFile(
     string line = "";
     int lineNum = 1;
     bool totalParseOk = true;
-    string oldFilename = kvr->c_filename;
-    
-    
-    // Set filename (used in printMessage)
-    kvr->c_filename = filename;
     
     
     // Check if already read a file
     if (kvr->c_isFileRead) {
-        printMessage(kvr->c_filename, "Already read a file");
-        kvr->c_filename = oldFilename;
+        KVR_UTILS::printMessage(filename, "Already read a file");
         return KVR_AlreadyReadAFile;
     }
     
@@ -130,10 +108,10 @@ KVR_Status KVR_readFile(
     // Open file
     file.open(filename);
     if (!file.is_open()) {
-        printMessage(kvr->c_filename, "Could not open file");
-        kvr->c_filename = oldFilename;
+        KVR_UTILS::printMessage(filename, "Could not open file");
         return KVR_OpenFileError;
     }
+    kvr->c_filename = filename;
     
     
     // Parse each line
@@ -147,15 +125,17 @@ KVR_Status KVR_readFile(
             totalParseOk = false;
             string errorString = "Parse error on line ";
             errorString += to_string(lineNum);
-            printMessage(kvr->c_filename, errorString);
+            KVR_UTILS::printMessage(kvr->c_filename, errorString);
         }
         
         // Check if duplicate key
-        else if (KVR_UTILS::findKey(kvr->c_keyVector, key) != KVR_UTILS::KEY_NOT_FOUND) {
+        else if (KVR_UTILS::findKey(kvr->c_keyVector, key) != 
+                 KVR_UTILS::KEY_NOT_FOUND)
+        {
             totalParseOk = false;
             string errorString = "Duplicate key on line ";
             errorString += to_string(lineNum);
-            printMessage(kvr->c_filename, errorString);
+            KVR_UTILS::printMessage(kvr->c_filename, errorString);
         }
         
         // Add key/value if line had one
@@ -178,32 +158,49 @@ KVR_Status KVR_readFile(
 }
 
 
-void *KVR_create()
+/*
+    KVR_create
+*/
+KVR_Status KVR_create(
+    void **kvrVoid)
 {
-    KVR_Data *kvr = new KVR_Data();
+    // Allocate kvr data
+    KVR_Data *kvr;
+    try {
+        kvr = new KVR_Data();
+    } catch(...) {
+        kvrVoid = NULL;
+        return KVR_AllocationError;
+    }
     
+    // Set the kvr data
     kvr->c_isFileRead = false;
     kvr->c_filename = "";
     kvr->c_keyVector.clear();
     kvr->c_valueVector.clear();
     
-    return kvr;
+    // Return
+    *kvrVoid = kvr;
+    return KVR_Success;
 }
 
 
-void KVR_delete(
-    void *kvrVoid)
+/*
+    KVR_delete
+*/
+KVR_Status KVR_delete(
+    void **kvrVoid)
 {
-    KVR_Data *kvr = static_cast<KVR_Data*>(kvrVoid);
+    KVR_Data *kvr = static_cast<KVR_Data*>(*kvrVoid);
     delete kvr;
+    kvrVoid = NULL;
+    return KVR_Success;
 }
 
 
 /*
     getString
     
-    Gets string value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to "".
 */
 KVR_Status KVR_getString(
@@ -232,8 +229,6 @@ KVR_Status KVR_getString(
 /*
     getInt
     
-    Gets integer value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
 KVR_Status KVR_getInt(
@@ -257,8 +252,8 @@ KVR_Status KVR_getInt(
         value = stoi(valueString);
     }
     catch (...) {
-        printMessage(kvr->c_filename, "Error converting value to int");
-        //throw ExceptionStringConversionError;
+        KVR_UTILS::printMessage(
+            kvr->c_filename, "Error converting value to int");
         return KVR_ConversionError;
     }
 
@@ -269,8 +264,6 @@ KVR_Status KVR_getInt(
 /*
     getDouble
     
-    Gets double value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
 KVR_Status KVR_getDouble(
@@ -294,7 +287,8 @@ KVR_Status KVR_getDouble(
         value = stod(valueString);
     }
     catch (...) {
-        printMessage(kvr->c_filename, "Error converting value to double");
+        KVR_UTILS::printMessage(
+            kvr->c_filename, "Error converting value to double");
         return KVR_ConversionError;
     }
 
@@ -305,8 +299,6 @@ KVR_Status KVR_getDouble(
 /*
     getFloat
     
-    Gets float value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
 KVR_Status KVR_getFloat(
@@ -330,7 +322,8 @@ KVR_Status KVR_getFloat(
         value = stof(valueString);
     }
     catch (...) {
-        printMessage(kvr->c_filename, "Error converting value to float");
+        KVR_UTILS::printMessage(
+            kvr->c_filename, "Error converting value to float");
         return KVR_ConversionError;
     }
 
@@ -341,8 +334,6 @@ KVR_Status KVR_getFloat(
 /*
     getBool
     
-    Gets boolean value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to false.
 */
 KVR_Status KVR_getBool(
@@ -374,30 +365,28 @@ KVR_Status KVR_getBool(
     }
     
     // String conversion error if we get here
-    printMessage(kvr->c_filename, "Error converting value to bool");
+    KVR_UTILS::printMessage(
+        kvr->c_filename, "Error converting value to bool");
     return KVR_ConversionError;
 }
 
 
 /*
     print
-    
-    Prints entire set of key/value pairs.
-    Throws an error if appropriate.
 */
 KVR_Status KVR_print(
     const void *kvrVoid)
 {
     const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
-    printf("\n--- KeyValueReader Data (%s) ---\n", kvr->c_filename.c_str());
     
     // Check for file read
     if (!kvr->c_isFileRead) {
-    	printMessage(kvr->c_filename, "File not read.");
+    	KVR_UTILS::printMessage(kvr->c_filename, "File not read.");
         return KVR_FileNotRead;
     }
     
     // Print KeyValueReader data
+    printf("\n--- KeyValueReader Data (%s) ---\n", kvr->c_filename.c_str());
     for (size_t i = 0; i < kvr->c_keyVector.size(); i++) {
         printf("    %s %s\n", kvr->c_keyVector[i].c_str(), 
                               kvr->c_valueVector[i].c_str());
@@ -407,5 +396,35 @@ KVR_Status KVR_print(
     return KVR_Success;
 }
 
+
+/*
+    KVR_getMaxValueLength
+*/
+KVR_Status KVR_getMaxValueLength(
+    const void *kvrVoid,
+    int *length)
+{
+    const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
+    *length = 0;
+    
+    // Check for file read
+    if (!kvr->c_isFileRead) {
+    	KVR_UTILS::printMessage(kvr->c_filename, "File not read.");
+        return KVR_FileNotRead;
+    }
+    
+    // Print KeyValueReader data
+    for (size_t i = 0; i < kvr->c_keyVector.size(); i++) {
+        if (*length < (int)kvr->c_valueVector[i].size())
+            *length = kvr->c_valueVector[i].size();
+    }
+    
+    // Add 1 to length for null terminator of C strings
+    *length = *length + 1;
+
+    return KVR_Success;
+}
+
+} // End extern "C"
 
 
