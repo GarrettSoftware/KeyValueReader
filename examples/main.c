@@ -22,34 +22,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __UTILS_H
-#define __UTILS_H
+#include "../include/KeyValueReader.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-#include <string>
-#include <vector>
+int main()
+{
+    void *kvr = NULL;
+    int maxStringLength = 0;
+    char *method;
+    int nx;
+    double dt;
+    int doExtraStuff;
 
-namespace KVR_UTILS {
+    // Create the Key/Value reader and read in file
+    KVR_create(&kvr);
+    KVR_readFile(kvr, "input.kv");
 
-static const int KEY_NOT_FOUND = -1;
+    // Get max string length necessary to hold values
+    KVR_getMaxValueLength(kvr, &maxStringLength);
+    method = malloc(maxStringLength);
 
-void printMessage(
-    const std::string &filename,
-    const std::string &message);
+    // Get parameters of different types
+    KVR_getString(kvr, "method", method);
+    KVR_getInt(kvr, "nx", &nx);
+    KVR_getDouble(kvr, "dt", &dt);
+    KVR_getBool(kvr, "doExtraStuff", &doExtraStuff);
 
-bool areStringsEqual(
-    const std::string &s1, 
-    const std::string &s2);
+    // Print the values that I got
+    printf("\nValues from the Key/Value reader\n");
+    printf("Method: %s\n", method);
+    printf("nx:     %d\n", nx);
+    printf("dt:     %f\n", dt);
+    printf("extra:  %s\n", doExtraStuff ? "true" : "false");
 
-int findKey(
-    const std::vector<std::string> &keyVector, 
-    const std::string &key);
+    // Print the Key/Value pairs from the file
+    KVR_print(kvr);
 
-bool parseLine(
-    const std::string &line, 
-    std::string &outKey, 
-    std::string &outValue);
-
-} // End namespace
-
-#endif
+    // Cleanup
+    free(method);
+    KVR_delete(&kvr);
+    return 0;
+}
 

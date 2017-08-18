@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2016 C. Kristopher Garrett
+Copyright (c) 2016-2017 C. Kristopher Garrett
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -50,11 +50,11 @@ TEST(OpenFileTests, FileExistsTest)
 }
 
 
-TEST(OpenFileTests, FileAlreadyOpenTest)
+TEST(OpenFileTests, ReadSecondFileTest)
 {
     void *kvr;
     KVR_create(&kvr);
-    KVR_Status error = KVR_AlreadyReadAFile;
+    KVR_Status error = KVR_CannotReadSecondFile;
 
     EXPECT_TRUE(trySuccess(kvr, "test_open.kv"));
     EXPECT_TRUE(tryFailure(kvr, "test_open.kv", error));
@@ -122,7 +122,7 @@ TEST(KeyValueTests, KeyValueSuccessTest)
     EXPECT_TRUE(tryKeyValueSuccessInt(kvr, "key2", 10));
     EXPECT_TRUE(tryKeyValueSuccessDouble(kvr, "key3", 10.0));
     EXPECT_TRUE(tryKeyValueSuccessFloat(kvr, "key3", 10.0f));
-    EXPECT_TRUE(tryKeyValueSuccessBool(kvr, "key4", true));
+    EXPECT_TRUE(tryKeyValueSuccessBool(kvr, "key4", 1));
 
     KVR_delete(&kvr);
 }
@@ -184,6 +184,21 @@ int main(
     char **argv)
 {
     ::testing ::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    int retval = RUN_ALL_TESTS();
+
+    // Check print routine
+    {
+        printf("\nVisually inspect that print from test_kv.kv works\n");
+        printf("Should contain keys: key1, key2, key3, key4\n");
+        printf("and values: string, 10, 10.0, true\n");
+        
+        void *kvr;
+        KVR_create(&kvr);
+        KVR_readFile(kvr, "test_kv.kv");
+        KVR_print(kvr);
+        KVR_delete(&kvr);
+    }
+
+    return retval;
 }
 

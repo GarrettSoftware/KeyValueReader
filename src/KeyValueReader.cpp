@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2016 C. Kristopher Garrett
+Copyright (c) 2016-2017 C. Kristopher Garrett
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -87,7 +87,7 @@ extern "C" {
 /*
     KVR_readFile
 */
-KVR_Status KVR_readFile(
+enum KVR_Status KVR_readFile(
     void *kvrVoid, 
     const char *filename)
 {
@@ -100,8 +100,8 @@ KVR_Status KVR_readFile(
     
     // Check if already read a file
     if (kvr->c_isFileRead) {
-        KVR_UTILS::printMessage(filename, "Already read a file");
-        return KVR_AlreadyReadAFile;
+        KVR_UTILS::printMessage(filename, "Cannot read a second file");
+        return KVR_CannotReadSecondFile;
     }
     
     
@@ -161,7 +161,7 @@ KVR_Status KVR_readFile(
 /*
     KVR_create
 */
-KVR_Status KVR_create(
+enum KVR_Status KVR_create(
     void **kvrVoid)
 {
     // Allocate kvr data
@@ -188,7 +188,7 @@ KVR_Status KVR_create(
 /*
     KVR_delete
 */
-KVR_Status KVR_delete(
+enum KVR_Status KVR_delete(
     void **kvrVoid)
 {
     KVR_Data *kvr = static_cast<KVR_Data*>(*kvrVoid);
@@ -203,7 +203,7 @@ KVR_Status KVR_delete(
     
     If an error occurs, value is set to "".
 */
-KVR_Status KVR_getString(
+enum KVR_Status KVR_getString(
     const void *kvrVoid, 
     const char *key, 
     char *value)
@@ -231,16 +231,16 @@ KVR_Status KVR_getString(
     
     If an error occurs, value is set to zero.
 */
-KVR_Status KVR_getInt(
+enum KVR_Status KVR_getInt(
     const void *kvrVoid, 
     const char *key, 
-    int &value)
+    int *value)
 {
     const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
     string valueString;
     
     // Default value
-    value = 0;
+    *value = 0;
     
     // Get value as string
     KVR_Status error = getStringPrivate(kvr, key, valueString);
@@ -249,7 +249,7 @@ KVR_Status KVR_getInt(
     
     // Convert to int
     try {
-        value = stoi(valueString);
+        *value = stoi(valueString);
     }
     catch (...) {
         KVR_UTILS::printMessage(
@@ -266,16 +266,16 @@ KVR_Status KVR_getInt(
     
     If an error occurs, value is set to zero.
 */
-KVR_Status KVR_getDouble(
+enum KVR_Status KVR_getDouble(
     const void *kvrVoid, 
     const char *key, 
-    double &value)
+    double *value)
 {
     const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
     string valueString;
     
     // Default value
-    value = 0.0;
+    *value = 0.0;
     
     // Get value as string
     KVR_Status error = getStringPrivate(kvr, key, valueString);
@@ -284,7 +284,7 @@ KVR_Status KVR_getDouble(
     
     // Convert to double
     try {
-        value = stod(valueString);
+        *value = stod(valueString);
     }
     catch (...) {
         KVR_UTILS::printMessage(
@@ -301,16 +301,16 @@ KVR_Status KVR_getDouble(
     
     If an error occurs, value is set to zero.
 */
-KVR_Status KVR_getFloat(
+enum KVR_Status KVR_getFloat(
     const void *kvrVoid, 
     const char *key, 
-    float &value)
+    float *value)
 {
     const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
     string valueString;
     
     // Default value
-    value = 0.0f;
+    *value = 0.0f;
     
     // Get value as string
     KVR_Status error = getStringPrivate(kvr, key, valueString);
@@ -319,7 +319,7 @@ KVR_Status KVR_getFloat(
     
     // Convert value to float
     try {
-        value = stof(valueString);
+        *value = stof(valueString);
     }
     catch (...) {
         KVR_UTILS::printMessage(
@@ -336,16 +336,16 @@ KVR_Status KVR_getFloat(
     
     If an error occurs, value is set to false.
 */
-KVR_Status KVR_getBool(
+enum KVR_Status KVR_getBool(
     const void *kvrVoid, 
     const char *key, 
-    bool &value)
+    int *value)
 {
     const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
     string valueString;
     
     // Default value
-    value = false;
+    *value = 0;
     
     // Get value from key as string
     KVR_Status error = getStringPrivate(kvr, key, valueString);
@@ -354,13 +354,13 @@ KVR_Status KVR_getBool(
     
     // Check for true
     if (KVR_UTILS::areStringsEqual(valueString, "true")) {
-        value = true;
+        *value = 1;
         return KVR_Success;
     }
     
     // Check for false
     if (KVR_UTILS::areStringsEqual(valueString, "false")) {
-        value = false;
+        *value = 0;
         return KVR_Success;
     }
     
@@ -374,7 +374,7 @@ KVR_Status KVR_getBool(
 /*
     print
 */
-KVR_Status KVR_print(
+enum KVR_Status KVR_print(
     const void *kvrVoid)
 {
     const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
@@ -400,7 +400,7 @@ KVR_Status KVR_print(
 /*
     KVR_getMaxValueLength
 */
-KVR_Status KVR_getMaxValueLength(
+enum KVR_Status KVR_getMaxValueLength(
     const void *kvrVoid,
     int *length)
 {

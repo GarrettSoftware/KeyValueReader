@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2016 C. Kristopher Garrett
+Copyright (c) 2016-2017 C. Kristopher Garrett
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ extern "C" {
 
 enum KVR_Status {
     KVR_Success,
-    KVR_AlreadyReadAFile,
+    KVR_CannotReadSecondFile,
     KVR_FileNotRead,
     KVR_OpenFileError,
     KVR_ParseFileError,
@@ -44,56 +44,55 @@ enum KVR_Status {
 /*
     Create/delete KeyValueReader strucuture.
 */
-KVR_Status KVR_create(
+enum KVR_Status KVR_create(
     void **kvr);
-KVR_Status KVR_delete(
+enum KVR_Status KVR_delete(
     void **kvr);
 
 /*
     Parse key/value file and store the data.
 */
-KVR_Status KVR_readFile(
+enum KVR_Status KVR_readFile(
     void *kvr, 
     const char *filename);
-
 
 /*
     Get the maximum length in characters of all values.
     Useful before using KVR_getString to know how large to 
     make value char array.
 */
-KVR_Status KVR_getMaxValueLength(
+enum KVR_Status KVR_getMaxValueLength(
     const void *kvr,
     int *length);
 
 /*
     Get value from key.
 */
-KVR_Status KVR_getString(
+enum KVR_Status KVR_getString(
     const void *kvr, 
     const char *key, 
     char *value);
-KVR_Status KVR_getInt(
+enum KVR_Status KVR_getInt(
     const void *kvr, 
     const char *key, 
-    int &value);
-KVR_Status KVR_getDouble(
+    int *value);
+enum KVR_Status KVR_getDouble(
     const void *kvr, 
     const char *key, 
-    double &value);
-KVR_Status KVR_getFloat(
+    double *value);
+enum KVR_Status KVR_getFloat(
     const void *kvr, 
     const char *key, 
-    float &value);
-KVR_Status KVR_getBool(
+    float *value);
+enum KVR_Status KVR_getBool(
     const void *kvr, 
     const char *key, 
-    bool &value);
+    int *value);
 
 /*
     Print the contents of all keys/values.
 */
-KVR_Status KVR_print(
+enum KVR_Status KVR_print(
     const void *kvr); 
 
 #ifdef __cplusplus
@@ -101,3 +100,4 @@ KVR_Status KVR_print(
 #endif
 
 #endif
+
