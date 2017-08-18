@@ -1,32 +1,50 @@
-#include "TestHelpers.h"
+/*
+The MIT License (MIT)
 
+Copyright (c) 2016-2017 C. Kristopher Garrett
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include "TestHelpers.h"
 
 /*
     Read file tests
 */
-bool trySuccess(CKG_Utils::KeyValueReader &kvr, 
-                const std::string &filename)
+bool trySuccess(
+    void *kvr, 
+    const std::string &filename)
 {
-    try {
-        kvr.readFile(filename);
+    KVR_Status error = KVR_readFile(kvr, filename.c_str());
+    if (error == KVR_Success)
         return true;
-    }
-    catch (...) { }
     return false;
 }
 
-bool tryFailure(CKG_Utils::KeyValueReader &kvr, 
-                const std::string &filename, 
-                const CKG_Utils::KeyValueReader::Exception e)
+bool tryFailure(
+    void *kvr, 
+    const std::string &filename, 
+    const KVR_Status error)
 {
-    try {
-        kvr.readFile(filename);
+    KVR_Status error1 = KVR_readFile(kvr, filename.c_str());
+    if (error != error1)
         return false;
-    }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
@@ -35,180 +53,180 @@ bool tryFailure(CKG_Utils::KeyValueReader &kvr,
     Key Value Tests
 */
 // String
-bool tryKeyValueSuccessString(CKG_Utils::KeyValueReader &kvr, 
-                              const std::string &key,
-                              const std::string &value)
+bool tryKeyValueSuccessString(
+    const void *kvr, 
+    const std::string &key,
+    const std::string &value)
 {
-    std::string value1;
-    
-    try {
-        kvr.getString(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    char valueChars[100];
+    KVR_Status error = KVR_getString(kvr, key.c_str(), valueChars);
+    std::string value1(valueChars);
+
+    if (error != KVR_Success)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 // int
-bool tryKeyValueSuccessInt(CKG_Utils::KeyValueReader &kvr, 
-                           const std::string &key,
-                           const int value)
+bool tryKeyValueSuccessInt(
+    const void *kvr, 
+    const std::string &key,
+    const int value)
 {
     int value1;
-    
-    try {
-        kvr.getInt(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    KVR_Status error = KVR_getInt(kvr, key.c_str(), &value1);
+
+    if (error != KVR_Success)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 // double
-bool tryKeyValueSuccessDouble(CKG_Utils::KeyValueReader &kvr, 
-                              const std::string &key,
-                              const double value)
+bool tryKeyValueSuccessDouble(
+    const void *kvr, 
+    const std::string &key,
+    const double value)
 {
     double value1;
-    
-    try {
-        kvr.getDouble(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    KVR_Status error = KVR_getDouble(kvr, key.c_str(), &value1);
+
+    if (error != KVR_Success)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 // float
-bool tryKeyValueSuccessFloat(CKG_Utils::KeyValueReader &kvr, 
-                             const std::string &key,
-                             const float value)
+bool tryKeyValueSuccessFloat(
+    const void *kvr, 
+    const std::string &key,
+    const float value)
 {
     float value1;
-    
-    try {
-        kvr.getFloat(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    KVR_Status error = KVR_getFloat(kvr, key.c_str(), &value1);
+
+    if (error != KVR_Success)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 // bool
-bool tryKeyValueSuccessBool(CKG_Utils::KeyValueReader &kvr, 
-                            const std::string &key,
-                            const bool value)
+bool tryKeyValueSuccessBool(
+    const void *kvr, 
+    const std::string &key,
+    const int value)
 {
-    bool value1;
-    
-    try {
-        kvr.getBool(key, value1);
-        if (value1 != value)
-            return false;
-    }
-    catch (...) {
+    int value1;
+    KVR_Status error = KVR_getBool(kvr, key.c_str(), &value1);
+
+    if (error != KVR_Success)
         return false;
-    }
+    if (value1 != value)
+        return false;
     return true;
 }
 
 // string
-bool tryKeyValueFailureString(CKG_Utils::KeyValueReader &kvr, 
-                              const std::string &key,
-                              const CKG_Utils::KeyValueReader::Exception e)
+bool tryKeyValueFailureString(
+    const void *kvr, 
+    const std::string &key,
+    const KVR_Status error)
 {
-    std::string value1;
-    
-    try {
-        kvr.getString(key, value1);
+    char valueChars[100];
+    KVR_Status error1 = KVR_getString(kvr, key.c_str(), valueChars);
+    std::string value1(valueChars);
+
+    if (error != error1)
         return false;
-    }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
 // int
-bool tryKeyValueFailureInt(CKG_Utils::KeyValueReader &kvr, 
-                           const std::string &key,
-                           const CKG_Utils::KeyValueReader::Exception e)
+bool tryKeyValueFailureInt(
+    const void *kvr, 
+    const std::string &key,
+    const KVR_Status error)
 {
     int value1;
-    
-    try {
-        kvr.getInt(key, value1);
+    KVR_Status error1 = KVR_getInt(kvr, key.c_str(), &value1);
+
+    if (error != error1)
         return false;
-    }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
 // double
-bool tryKeyValueFailureDouble(CKG_Utils::KeyValueReader &kvr, 
-                              const std::string &key,
-                              const CKG_Utils::KeyValueReader::Exception e)
+bool tryKeyValueFailureDouble(
+    const void *kvr, 
+    const std::string &key,
+    const KVR_Status error)
 {
     double value1;
-    
-    try {
-        kvr.getDouble(key, value1);
+    KVR_Status error1 = KVR_getDouble(kvr, key.c_str(), &value1);
+
+    if (error != error1)
         return false;
-    }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
 // float
-bool tryKeyValueFailureFloat(CKG_Utils::KeyValueReader &kvr, 
-                             const std::string &key,
-                             const CKG_Utils::KeyValueReader::Exception e)
+bool tryKeyValueFailureFloat(
+    const void *kvr, 
+    const std::string &key,
+    const KVR_Status error)
 {
     float value1;
-    
-    try {
-        kvr.getFloat(key, value1);
+    KVR_Status error1 = KVR_getFloat(kvr, key.c_str(), &value1);
+
+    if (error != error1)
         return false;
-    }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
 // bool
-bool tryKeyValueFailureBool(CKG_Utils::KeyValueReader &kvr, 
-                            const std::string &key,
-                            const CKG_Utils::KeyValueReader::Exception e)
+bool tryKeyValueFailureBool(
+    const void *kvr, 
+    const std::string &key,
+    const KVR_Status error)
 {
-    bool value1;
-    
-    try {
-        kvr.getBool(key, value1);
+    int value1;
+    KVR_Status error1 = KVR_getBool(kvr, key.c_str(), &value1);
+
+    if (error != error1)
         return false;
-    }
-    catch (CKG_Utils::KeyValueReader::Exception e1) {
-        if (e1 != e)
-            return false;
-    }
     return true;
 }
 
 
+/*
+    Max value length tests
+*/
+bool tryMaxValueLengthSuccess(
+    const void *kvr,
+    const int length)
+{
+    int length1;
+    KVR_Status error = KVR_getMaxValueLength(kvr, &length1);
+
+    if (error != KVR_Success)
+        return false;
+    if (length != length1)
+        return false;
+    return true;
+}
+
+bool tryMaxValueLengthFailure(
+    const void *kvr,
+    const KVR_Status error)
+{
+    int length1;
+    KVR_Status error1 = KVR_getMaxValueLength(kvr, &length1);
+
+    if (error != error1)
+        return false;
+    return true;
+}
 

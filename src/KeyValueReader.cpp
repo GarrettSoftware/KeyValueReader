@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2016 C. Kristopher Garrett
+Copyright (c) 2016-2017 C. Kristopher Garrett
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,324 +22,126 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "KeyValueReader.h"
+#include "../include/KeyValueReader.h"
+#include "utils.h"
 #include <vector>
 #include <fstream>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 using namespace std;
 
-static const int KEY_NOT_FOUND = -1;
-
-namespace CKG_Utils {
-
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-//                              Helper Functions
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 
 /*
-    getRidOfComments
-    
-    Deletes # and everything after that in the string.
+    KeyValueReader data
 */
-static
-void getRidOfComments(string &line)
+namespace {
+struct KVR_Data
 {
-    size_t commentStart = line.find('#');
-    if (commentStart != string::npos)
-        line = line.substr(0, commentStart);
-}
-
-
-/*
-    deleteWhitespace
-    
-    Deletes all the initial whitespace in the string.
-    Returns number of whitespace characters.
-*/
-static
-size_t deleteWhitespace(string &line)
-{
-    static const string whitespace = " \t";
-    size_t pos = 0;
-    
-    for (pos = 0; pos < line.size(); pos++) {
-        if (whitespace.find(line[pos]) == string::npos) 
-            break;
-    }
-    line = line.substr(pos);
-    return pos;
-}
-
-
-/*
-    areStringsEqual
-    
-    Returns true if the two strings are equal.
-    Neglects upper/lower case.
-*/
-static
-bool areStringsEqual(const string &s1, const string &s2)
-{
-    if (s1.size() != s2.size())
-        return false;
-    
-    for (size_t i = 0; i < s1.size(); i++) {
-        if (toupper(s1[i]) != toupper(s2[i]))
-            return false;
-    }
-    
-    return true;
-}
-
-
-/*
-    popToken
-    
-    A token is made up of a-z, A-Z, 0-9, and {+,-,_,.}.
-    Takes the token out of 'line' and puts it in 'token'.
-*/
-static
-void popToken(string &line, string &token)
-{
-    static const string allowableChar = "abcdefghijklmnopqrstuvwxyz"
-                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "0123456789"
-                                        "+-_.";
-    size_t pos = 0;
-    token = "";
-    
-    for (pos = 0; pos < line.size(); pos++) {
-        if (allowableChar.find(line[pos]) == string::npos) 
-            break;
-    }
-    token = line.substr(0, pos);
-    line = line.substr(pos);
-}
-
-
-/*
-    parseLine
-    
-    From a line of input, sets outKey and outValue.
-    If the line parses correctly, function returns true.
-    Otherwise function returns false.
-    
-    In the case of true return and the line contains a key/value pair, outKey and
-    outValue contain that data.
-    In the case of true return and the line contains only whitespace or comments,
-    outKey and outValue are set to "".
-    In the case of false return, outKey and outValue are set to "".
-*/
-static
-bool parseLine(const string &line, string &outKey, string &outValue)
-{
-    string parsedLine = line;
-    size_t numWhitespace = 0;
-    string key = "";
-    string value = "";
-    
-    // Set outKey, outValue to default ""
-    outKey = "";
-    outValue = "";
-    
-    // Get rid of comments in line
-    getRidOfComments(parsedLine);
-    
-    // Delete whitespace
-    deleteWhitespace(parsedLine);
-    
-    // Check for empty line
-    if (parsedLine.size() == 0) {
-        return true;
-    }
-    
-    // Get key
-    popToken(parsedLine, key);
-    if (key == "") {
-    	return false;
-    }
-    
-    // Delete whitespace
-    numWhitespace = deleteWhitespace(parsedLine);
-    if (numWhitespace == 0) {
-    	return false;
-    }
-    
-    // Get value
-    popToken(parsedLine, value);
-    if (value == "") {
-    	return false;
-    }
-    
-    // Delete whitespace
-    deleteWhitespace(parsedLine);
-    
-    // Check for non-empty line
-    if (parsedLine.size() != 0) {
-    	return false;
-    }
-    
-    // If here, the line parsed correctly
-    outKey = key;
-    outValue = value;
-    return true;
-}
-
-
-/*
-    findKey
-    
-    Returns the index of the key in the keyVector.
-    If key is not found, returns KEY_NOT_FOUND.
-*/
-static
-int findKey(const vector<string> &keyVector, const string &key)
-{
-    for (size_t i = 0; i < keyVector.size(); i++) {
-        if (areStringsEqual(key, keyVector[i])) {
-            return i;
-        }
-    }
-    
-    return KEY_NOT_FOUND;
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-//                              Private Class Data
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-
-/*
-    PrivateData class
-*/
-struct KeyValueReader::Private
-{
-    void printMessage(const string &message);
-    
     vector<string> c_keyVector;
     vector<string> c_valueVector;
     bool c_isFileRead;
     string c_filename;
-};
+};}
 
 
 /*
-    printMessage
+    getStringPrivate
     
-    Causes an abort of the program due to an error.
+    Gets string value from key.
+    If an error occurs, value is set to "".
 */
-void KeyValueReader::Private::printMessage(const string &message)
+static
+KVR_Status getStringPrivate(
+    const KVR_Data *kvr, 
+    const char *key, 
+    std::string &value)
 {
-    printf("KeyValueReader error in file %s\n", c_filename.c_str());
-    printf("   %s\n", message.c_str());
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-//                              Class Implementation
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-
-/*
-    Constructor/Destructor
-*/
-KeyValueReader::KeyValueReader()
-{
-    c_data = new Private();
-    reset();
-}
-KeyValueReader::~KeyValueReader()
-{
-    delete c_data;
-}
-
-
-/*
-    reset
+    int keyIndex = 0;
+	
+    // Default value
+    value = "";
+	
+    // Check for file read
+    if (!kvr->c_isFileRead) {
+    	KVR_UTILS::printMessage(kvr->c_filename, "File not read.");
+        return KVR_FileNotRead;
+    }
     
-    Resets the KeyValueReader to an uninitialized state.
-*/
-void KeyValueReader::reset()
-{
-	c_data->c_isFileRead = false;
-    c_data->c_filename = "";
-    c_data->c_keyVector.clear();
-    c_data->c_valueVector.clear();
+    // Find value from key
+    keyIndex = KVR_UTILS::findKey(kvr->c_keyVector, key);
+    if (keyIndex == KVR_UTILS::KEY_NOT_FOUND) {
+    	KVR_UTILS::printMessage(kvr->c_filename, "Key not found");
+        return KVR_KeyNotFound;
+    }
+    
+    value = kvr->c_valueVector[keyIndex];
+    return KVR_Success;
 }
 
 
+// Public C interface
+extern "C" {
+
 /*
-    readFile
-    
-    Reads in a key-value file.
-    Throws an error if appropriate.
+    KVR_readFile
 */
-void KeyValueReader::readFile(const string &filename)
+enum KVR_Status KVR_readFile(
+    void *kvrVoid, 
+    const char *filename)
 {
+    KVR_Data *kvr = static_cast<KVR_Data*>(kvrVoid);
     ifstream file;
     string line = "";
     int lineNum = 1;
     bool totalParseOk = true;
-    string oldFilename = c_data->c_filename;
-    
-    
-    // Set filename (used in printMessage)
-    c_data->c_filename = filename;
     
     
     // Check if already read a file
-    if (c_data->c_isFileRead) {
-        c_data->printMessage("Already read a file");
-        c_data->c_filename = oldFilename;
-        throw ExceptionAlreadyReadAFile;
+    if (kvr->c_isFileRead) {
+        KVR_UTILS::printMessage(filename, "Cannot read a second file");
+        return KVR_CannotReadSecondFile;
     }
     
     
     // Open file
     file.open(filename);
     if (!file.is_open()) {
-        c_data->printMessage("Could not open file");
-        c_data->c_filename = oldFilename;
-        throw ExceptionOpenFileError;
+        KVR_UTILS::printMessage(filename, "Could not open file");
+        return KVR_OpenFileError;
     }
+    kvr->c_filename = filename;
     
     
     // Parse each line
     while (std::getline(file, line)) {
         string key = "";
         string value = "";
-        bool parseOk = parseLine(line, key, value);
+        bool parseOk = KVR_UTILS::parseLine(line, key, value);
         
         // Check parse is ok
         if (!parseOk) {
             totalParseOk = false;
             string errorString = "Parse error on line ";
             errorString += to_string(lineNum);
-            c_data->printMessage(errorString);
+            KVR_UTILS::printMessage(kvr->c_filename, errorString);
         }
         
         // Check if duplicate key
-        else if (findKey(c_data->c_keyVector, key) != KEY_NOT_FOUND) {
+        else if (KVR_UTILS::findKey(kvr->c_keyVector, key) != 
+                 KVR_UTILS::KEY_NOT_FOUND)
+        {
             totalParseOk = false;
-        	string errorString = "Duplicate key on line ";
+            string errorString = "Duplicate key on line ";
             errorString += to_string(lineNum);
-            c_data->printMessage(errorString);
+            KVR_UTILS::printMessage(kvr->c_filename, errorString);
         }
         
         // Add key/value if line had one
         else if (key != "") {
-            c_data->c_keyVector.push_back(key);
-            c_data->c_valueVector.push_back(value);
+            kvr->c_keyVector.push_back(key);
+            kvr->c_valueVector.push_back(value);
         }
         lineNum++;
     }
@@ -347,187 +149,282 @@ void KeyValueReader::readFile(const string &filename)
     
     // Close file and return
     file.close();
-    c_data->c_isFileRead = true;
+    kvr->c_isFileRead = true;
     
     if (!totalParseOk)
-        throw ExceptionParseFileError;
+        return KVR_ParseFileError;
+
+    return KVR_Success;
+}
+
+
+/*
+    KVR_create
+*/
+enum KVR_Status KVR_create(
+    void **kvrVoid)
+{
+    // Allocate kvr data
+    KVR_Data *kvr;
+    try {
+        kvr = new KVR_Data();
+    } catch(...) {
+        kvrVoid = NULL;
+        return KVR_AllocationError;
+    }
+    
+    // Set the kvr data
+    kvr->c_isFileRead = false;
+    kvr->c_filename = "";
+    kvr->c_keyVector.clear();
+    kvr->c_valueVector.clear();
+    
+    // Return
+    *kvrVoid = kvr;
+    return KVR_Success;
+}
+
+
+/*
+    KVR_delete
+*/
+enum KVR_Status KVR_delete(
+    void **kvrVoid)
+{
+    KVR_Data *kvr = static_cast<KVR_Data*>(*kvrVoid);
+    delete kvr;
+    kvrVoid = NULL;
+    return KVR_Success;
 }
 
 
 /*
     getString
     
-    Gets string value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to "".
 */
-void KeyValueReader::getString(const std::string &key, std::string &value) const
+enum KVR_Status KVR_getString(
+    const void *kvrVoid, 
+    const char *key, 
+    char *value)
 {
-	int keyIndex = 0;
-	
-	// Default value
-    value = "";
-	
-	// Check for file read
-    if (!c_data->c_isFileRead) {
-    	c_data->printMessage("File not read.");
-    	throw ExceptionFileNotRead;
-    }
+    const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
+    string valueString;
     
-    // Find value from key
-    keyIndex = findKey(c_data->c_keyVector, key);
-    if (keyIndex == KEY_NOT_FOUND) {
-    	c_data->printMessage("Key not found");
-    	throw ExceptionKeyNotFound;
-    }
+    // Default value
+    value[0] = 0;
     
-    value = c_data->c_valueVector[keyIndex];
+    // Get value as string
+    KVR_Status error = getStringPrivate(kvr, key, valueString);
+    if (error != KVR_Success)
+        return error;
+    
+    // Copy string into char array
+    strcpy(value, valueString.c_str());
+
+    return KVR_Success;
 }
 
 
 /*
     getInt
     
-    Gets integer value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
-void KeyValueReader::getInt(const std::string &key, int &value) const
+enum KVR_Status KVR_getInt(
+    const void *kvrVoid, 
+    const char *key, 
+    int *value)
 {
+    const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
     string valueString;
     
     // Default value
-    value = 0;
+    *value = 0;
     
     // Get value as string
-    getString(key, valueString);
+    KVR_Status error = getStringPrivate(kvr, key, valueString);
+    if (error != KVR_Success)
+        return error;
     
     // Convert to int
     try {
-        value = stoi(valueString);
+        *value = stoi(valueString);
     }
     catch (...) {
-        c_data->printMessage("Error converting value to int");
-        throw ExceptionStringConversionError;
+        KVR_UTILS::printMessage(
+            kvr->c_filename, "Error converting value to int");
+        return KVR_ConversionError;
     }
+
+    return KVR_Success;
 }
 
 
 /*
     getDouble
     
-    Gets double value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
-void KeyValueReader::getDouble(const std::string &key, double &value) const
+enum KVR_Status KVR_getDouble(
+    const void *kvrVoid, 
+    const char *key, 
+    double *value)
 {
+    const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
     string valueString;
     
     // Default value
-    value = 0.0;
+    *value = 0.0;
     
     // Get value as string
-    getString(key, valueString);
+    KVR_Status error = getStringPrivate(kvr, key, valueString);
+    if (error != KVR_Success)
+        return error;
     
     // Convert to double
     try {
-        value = stod(valueString);
+        *value = stod(valueString);
     }
     catch (...) {
-        c_data->printMessage("Error converting value to double");
-        throw ExceptionStringConversionError;
+        KVR_UTILS::printMessage(
+            kvr->c_filename, "Error converting value to double");
+        return KVR_ConversionError;
     }
+
+    return KVR_Success;
 }
 
 
 /*
     getFloat
     
-    Gets float value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to zero.
 */
-void KeyValueReader::getFloat(const std::string &key, float &value) const
+enum KVR_Status KVR_getFloat(
+    const void *kvrVoid, 
+    const char *key, 
+    float *value)
 {
+    const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
     string valueString;
     
     // Default value
-    value = 0.0f;
+    *value = 0.0f;
     
     // Get value as string
-    getString(key, valueString);
+    KVR_Status error = getStringPrivate(kvr, key, valueString);
+    if (error != KVR_Success)
+        return error;
     
     // Convert value to float
     try {
-        value = stof(valueString);
+        *value = stof(valueString);
     }
     catch (...) {
-        c_data->printMessage("Error converting value to float");
-        throw ExceptionStringConversionError;
+        KVR_UTILS::printMessage(
+            kvr->c_filename, "Error converting value to float");
+        return KVR_ConversionError;
     }
+
+    return KVR_Success;
 }
 
 
 /*
     getBool
     
-    Gets boolean value from key.
-    Throws an error if appropriate.
     If an error occurs, value is set to false.
 */
-void KeyValueReader::getBool(const std::string &key, bool &value) const
+enum KVR_Status KVR_getBool(
+    const void *kvrVoid, 
+    const char *key, 
+    int *value)
 {
+    const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
     string valueString;
     
     // Default value
-    value = false;
+    *value = 0;
     
     // Get value from key as string
-    getString(key, valueString);
+    KVR_Status error = getStringPrivate(kvr, key, valueString);
+    if (error != KVR_Success)
+        return error;
     
     // Check for true
-    if (areStringsEqual(valueString, "true")) {
-        value = true;
-        return;
+    if (KVR_UTILS::areStringsEqual(valueString, "true")) {
+        *value = 1;
+        return KVR_Success;
     }
     
     // Check for false
-    if (areStringsEqual(valueString, "false")) {
-        value = false;
-        return;
+    if (KVR_UTILS::areStringsEqual(valueString, "false")) {
+        *value = 0;
+        return KVR_Success;
     }
     
     // String conversion error if we get here
-    c_data->printMessage("Error converting value to bool");
-    throw ExceptionStringConversionError;
+    KVR_UTILS::printMessage(
+        kvr->c_filename, "Error converting value to bool");
+    return KVR_ConversionError;
 }
 
 
 /*
     print
-    
-    Prints entire set of key/value pairs.
-    Throws an error if appropriate.
 */
-void KeyValueReader::print() const
+enum KVR_Status KVR_print(
+    const void *kvrVoid)
 {
-    printf("\n--- KeyValueReader Data (%s) ---\n", c_data->c_filename.c_str());
+    const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
     
     // Check for file read
-    if (!c_data->c_isFileRead) {
-    	c_data->printMessage("File not read.");
-    	throw ExceptionFileNotRead;
+    if (!kvr->c_isFileRead) {
+    	KVR_UTILS::printMessage(kvr->c_filename, "File not read.");
+        return KVR_FileNotRead;
     }
     
     // Print KeyValueReader data
-    for (size_t i = 0; i < c_data->c_keyVector.size(); i++) {
-        printf("    %s %s\n", c_data->c_keyVector[i].c_str(), 
-                              c_data->c_valueVector[i].c_str());
+    printf("\n--- KeyValueReader Data (%s) ---\n", kvr->c_filename.c_str());
+    for (size_t i = 0; i < kvr->c_keyVector.size(); i++) {
+        printf("    %s %s\n", kvr->c_keyVector[i].c_str(), 
+                              kvr->c_valueVector[i].c_str());
     }
     printf("\n");
+    
+    return KVR_Success;
 }
 
 
-} // End namespace
+/*
+    KVR_getMaxValueLength
+*/
+enum KVR_Status KVR_getMaxValueLength(
+    const void *kvrVoid,
+    int *length)
+{
+    const KVR_Data *kvr = static_cast<const KVR_Data*>(kvrVoid);
+    *length = 0;
+    
+    // Check for file read
+    if (!kvr->c_isFileRead) {
+    	KVR_UTILS::printMessage(kvr->c_filename, "File not read.");
+        return KVR_FileNotRead;
+    }
+    
+    // Print KeyValueReader data
+    for (size_t i = 0; i < kvr->c_keyVector.size(); i++) {
+        if (*length < (int)kvr->c_valueVector[i].size())
+            *length = kvr->c_valueVector[i].size();
+    }
+    
+    // Add 1 to length for null terminator of C strings
+    *length = *length + 1;
+
+    return KVR_Success;
+}
+
+} // End extern "C"
+
 

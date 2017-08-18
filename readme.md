@@ -1,18 +1,29 @@
-# KeyValueReader
-
-# KeyValueReader 1.1
-
-## Releases
-Each release is tagged.
-The main branch should contain the latest release.
-The easiest way to get the latest release is to either `git clone` the repository or select the "Download ZIP" button from the main page.
+# KeyValueReader 2.0
 
 ## Overview 
-This software implements a single class to easily add basic file input to your programs.
-Just put KeyValueReader.cpp and KeyValueReader.h in your project and add the extra sources to your build.
-Note: this software requires the C++11 standard.
-For g++ you will need the flag `--std=c++11`.
+This is a library to implement a simple Key/Value reader from file.
+The goal is for the library to be very simple to use and understand.
 
+I wrote it with the science community in mind, especially for small projects that want a simple ability to read input parameters from file.
+This is the reason for both a C and Fortran interface.
+
+## Getting the software
+The main repository for this software is: https://github.com/GarrettSoftware/KeyValueReader
+
+To get the software, click on the `Branch` button and choose the version you want to use.
+Alternatively, the `master` branch should contain the latest stable version.
+
+## Compiling the software
+The software is compiled using C++ and requires a compiler that implements the C++11 standard.
+If you are using GCC, you should be able to type `make` in the main directory to build the library.
+If you are not using GCC, open `Makefile` and set the top line for your compiler.
+Both a static and dynamic library are created and placed in a directory called `lib`.
+
+## Using the software
+There are examples in the `example` directory of how to build both a C and Fortran application with the library.
+
+
+# OOOLLLLDDDD
 Basic usage looks like the following.
 For simple programs, you may not want to use a try/catch block and simply let the program abort from any exception that occurs.
 
@@ -99,4 +110,10 @@ An example of an input file might look like the following.
     TOLERANCE       0.01    # Small Tolerance
     DO_EXTRA_THING  true
 
+
+
+## Releases
+Each release is tagged.
+The main branch should contain the latest release.
+The easiest way to get the latest release is to either `git clone` the repository or select the "Download ZIP" button from the main page.
 

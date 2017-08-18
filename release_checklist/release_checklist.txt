@@ -1,0 +1,6 @@
+- Run all tests
+- Update readme.md
+- ./check_headers
+- Do a pull request
+- Create a new branch for new version
+

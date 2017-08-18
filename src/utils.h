@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2016 C. Kristopher Garrett
+Copyright (c) 2016-2017 C. Kristopher Garrett
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,38 +22,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __KEY_VALUE_READER_C_H
-#define __KEY_VALUE_READER_C_H
+#ifndef __UTILS_H
+#define __UTILS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <string>
+#include <vector>
 
-enum KVR_Error {
-    KVR_Error_None,
-    KVR_Error_AlreadyReadAFile,
-    KVR_Error_FileNotRead,
-    KVR_Error_OpenFileError,
-    KVR_Error_ParseFileError,
-    KVR_Error_KeyNotFound,
-    KVR_Error_StringConversionError,
-};
+namespace KVR_UTILS {
 
-void* KVR_createKeyValueReader();
-void KVR_deleteKeyValueReader(void *kvr);
+static const int KEY_NOT_FOUND = -1;
 
-KVR_Error KVR_readFile(void *kvr, const char *filename);
-KVR_Error KVR_getString(void *kvr, const char *key, char *value);
-KVR_Error KVR_getInt(void *kvr, const char *key, int *value);
-KVR_Error KVR_getDouble(void *kvr, const char *key, double *value);
-KVR_Error KVR_getFloat(void *kvr, const char *key, float *value);
-KVR_Error KVR_getBool(void *kvr, const char *key, int *value);
-KVR_Error KVR_print();
-KVR_Error KVR_reset();
+void printMessage(
+    const std::string &filename,
+    const std::string &message);
 
-#ifdef __cplusplus
-}
-#endif
+bool areStringsEqual(
+    const std::string &s1, 
+    const std::string &s2);
+
+int findKey(
+    const std::vector<std::string> &keyVector, 
+    const std::string &key);
+
+bool parseLine(
+    const std::string &line, 
+    std::string &outKey, 
+    std::string &outValue);
+
+} // End namespace
 
 #endif
 
